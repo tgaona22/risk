@@ -1,7 +1,5 @@
 #include "console.h"
 
-#include <iostream>
-
 Console::Console(int log_length, const sf::Vector2<int>& window_size) {
   font_size = 16;
   font.loadFromFile("/usr/share/fonts/truetype/DroidSans.ttf");
