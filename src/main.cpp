@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include "console.h"
+#include "map.h"
 
 int main() {
   sf::Vector2<int> window_size(600, 400);
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
   Console console(5, window_size);
+  Map map("../testboard.txt");
 
   while (window.isOpen()) {
     sf::Event event;
@@ -43,6 +45,7 @@ int main() {
 
     window.clear();
     window.draw(console);
+    window.draw(map);
     window.display();
   }
 
