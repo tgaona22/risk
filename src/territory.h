@@ -19,8 +19,9 @@ private:
   int radius;
   const sf::Vector2f position;
   sf::Font font;
-  sf::Text text;
-  const sf::Vector2f text_position;
+  sf::Text name_text;
+  sf::Text units_text;
+  const sf::Vector2f name_position;
   
 public:
   // Initialization related functions

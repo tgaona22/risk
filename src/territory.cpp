@@ -5,16 +5,21 @@ Territory::Territory(const std::string& name, int id, int pos_x, int pos_y) :
   territory_id(id),
   player_id(0),
   units(0),
-  radius(20),
+  radius(15),
   position(pos_x, pos_y),
-  text_position(pos_x - radius + 2, pos_y)
+  name_position(pos_x - radius, pos_y + radius)
 {
   font.loadFromFile("/usr/share/fonts/truetype/DroidSans.ttf");
-  text.setFont(font);
-  text.setString(name);
-  text.setCharacterSize(8);
-  text.setPosition(text_position);
-  text.setColor(sf::Color::Red);
+  name_text.setFont(font);
+  name_text.setString(name);
+  name_text.setCharacterSize(8);
+  name_text.setPosition(name_position);
+  name_text.setColor(sf::Color::Red);
+  units_text.setFont(font);
+  units_text.setString(std::to_string(units));
+  units_text.setCharacterSize(8);
+  units_text.setPosition(position.x - 2, position.y - 4);
+  units_text.setColor(sf::Color::Black);
   sprite.setPosition(position.x - radius, position.y - radius);
   sprite.setRadius(radius);
   sprite.setPointCount(80);
@@ -22,7 +27,8 @@ Territory::Territory(const std::string& name, int id, int pos_x, int pos_y) :
 
 void Territory::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   target.draw(sprite);
-  target.draw(text);
+  target.draw(name_text);
+  target.draw(units_text);
 }
 
 void Territory::addNeighbor(Territory *territory) {

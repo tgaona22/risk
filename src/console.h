@@ -15,8 +15,8 @@ private:
 
   sf::Font font;
   int font_size;
-  sf::Vector2<int> position;
-  sf::Vector2<int> size;
+  sf::Vector2<int> position; // the upper left hand corner of the console.
+  sf::Vector2<int> size; // the length and width of the console.
 
 public:
   // Constructor and destructor

@@ -6,7 +6,7 @@
 #include "map.h"
 
 int main() {
-  sf::Vector2<int> window_size(600, 400);
+  sf::Vector2<int> window_size(900, 600);
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
   Console console(5, window_size);
