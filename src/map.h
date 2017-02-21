@@ -21,6 +21,7 @@ public:
   ~Map();
 
   Territory* getTerritory(const std::string& name);
+  std::map<std::string, Territory*> getTerritories(); // Note: this is copying the map...
 
 private:
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

@@ -21,8 +21,7 @@ Map::~Map() {
 void Map::initTerritories(const std::string& mapfile) {
   std::ifstream in(mapfile);
   std::string line;
-  // The id corresponds to the territory's location in the territories vector.
-  int id = 0;
+
   while (std::getline(in, line)) {
     std::istringstream line_stream(line);
     // Read the territory name.
@@ -48,7 +47,6 @@ void Map::initNeighbors(const std::string& mapfile) {
   std::ifstream in(mapfile);
   std::string line;
   
-  int territory_index = 0;
   while (std::getline(in, line)) {
     std::istringstream line_stream(line);
     std::string name;
@@ -88,6 +86,10 @@ Territory* Map::getTerritory(const std::string& name) {
     return nullptr;
   }
   return iter->second;
+}
+
+std::map<std::string, Territory*> getTerritories() {
+  return territories;
 }
     
     
