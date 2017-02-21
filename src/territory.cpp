@@ -1,8 +1,7 @@
 #include "territory.h"
 
-Territory::Territory(const std::string& name, int id, int pos_x, int pos_y) :
+Territory::Territory(const std::string& name, int pos_x, int pos_y) :
   name(name), 
-  territory_id(id),
   player_id(0),
   units(0),
   radius(15),

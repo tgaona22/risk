@@ -9,8 +9,8 @@
 
 class Map : public sf::Drawable {
 private:
-  std::vector<Territory*> territories;
-  std::map<std::string, int> name_map; // This maps territory names to their id #'s.
+  //std::vector<Territory*> territories;
+  std::map<std::string, Territory*> territories; // This maps territory names to pointers to Territory objects.
   
   // UI/Display related members.
   sf::Vector2<int> position; // The upper left hand corner of the map.
