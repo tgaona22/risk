@@ -13,9 +13,11 @@ private:
   std::map<std::string, int> name_map; // This maps territory names to their id #'s.
   
   // UI/Display related members.
+  sf::Vector2<int> position; // The upper left hand corner of the map.
+  sf::Vector2<int> size; // How long and wide the map is.
   std::vector<sf::Vertex> connecting_lines; // A vertex array of the lines between neighboring territories.
 public:
-  Map(const std::string& mapfile);
+  Map(const std::string& mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz);
   ~Map();
 
   Territory* getTerritory(const std::string& name);

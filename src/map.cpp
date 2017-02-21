@@ -4,7 +4,10 @@
 
 #include <iostream>
 
-Map::Map(const std::string& mapfile) {
+Map::Map(const std::string& mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) :
+  position(pos),
+  size(sz)
+{
   initTerritories(mapfile);
   initNeighbors(mapfile);
 }
@@ -33,7 +36,7 @@ void Map::initTerritories(const std::string& mapfile) {
     line_stream >> coordinate;
     int y = std::stoi(coordinate);
     // Create the territory and add it to the territories vector.
-    Territory *territory = new Territory(territory_name, id, x, y);
+    Territory *territory = new Territory(territory_name, id, x + position.x, y + position.y);
     territories.push_back(territory);
     // Note: we can only add the neighbors once all territories have been created.
   }

@@ -10,7 +10,7 @@ int main() {
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
   Console console(5, window_size);
-  Map map("../testboard.txt");
+  Map map("../testboard.txt", sf::Vector2<int>(0,0), sf::Vector2<int>(0,0));
 
   while (window.isOpen()) {
     sf::Event event;
