@@ -4,6 +4,8 @@ Console::Console(int log_length, const sf::Vector2<int>& window_size) {
   font_size = 16;
   font.loadFromFile("/usr/share/fonts/truetype/DroidSans.ttf");
 
+  listen_to_input = false;
+
   // Size denotes the length and width of the console.
   size.x = window_size.x;
   size.y = font_size * (log_length + 1);
@@ -43,10 +45,30 @@ Console::~Console() {
   }
 }
 
+std::string Console::prompt(const std::string& msg) {
+  listen_to_input = true;
+  addToLog(msg, sf::Color::Magenta);
+  command_entered = false;
+  // Block this thread until the user enters a command.
+  while(!command_entered) { }
+  listen_to_input = false;
+  // Return the most recently entered command.
+  std::string latest_command = log.at(log.size() - 1)->getString();
+  return latest_command;
+}
+
+void Console::addToLog(const std::string& msg, sf::Color color = sf::Color::Green) {
+  log_offset = 0;
+  sf::Text *msg_text = new sf::Text(msg, font, font_size);
+  msg_text->setColor(color);
+  log.push_back(msg_text);
+  updateLogPositions();
+}
+
 /* If the current command does not exceed the maximum length, adds
  * the character to the end of the command. */
 void Console::readText(int character) {
-  if (cmdstring.length() < max_cmd_length) {
+  if (listen_to_input && cmdstring.length() < max_cmd_length) {
     cmdstring += character;
     cmdline.setString(cmdstring);
   }
@@ -54,7 +76,7 @@ void Console::readText(int character) {
 
 // Deletes a character from the current command.
 void Console::deleteText() {
-  if (cmdstring.length() > 2) {
+  if (listen_to_input && cmdstring.length() > 2) {
     cmdstring.erase(cmdstring.length() - 1, 1);
     cmdline.setString(cmdstring);
   }
@@ -63,16 +85,14 @@ void Console::deleteText() {
 /* Accepts the current command, sends it to Game for parsing, and 
  * records it in the message log. */
 bool Console::enterCommand() {
-  std::string input = cmdstring.substr(2, std::string::npos);
-  // Here would be a good place to parse the input.
-  // For now, we'll just move it into the log and wipe the command line.
-  // On entering a command, we want the log to go back to the most recent commands.
-  log_offset = 0;
-  log.push_back(new sf::Text(input, font, font_size));
-  updateLogPositions();
+  if (listen_to_input) {
+    std::string input = cmdstring.substr(2, std::string::npos);
+    addToLog(input);
+    command_entered = true;
   
-  cmdstring = "> ";
-  cmdline.setString(cmdstring);
+    cmdstring = "> ";
+    cmdline.setString(cmdstring);
+  }
   return true;
 }
 

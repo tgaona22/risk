@@ -81,6 +81,10 @@ void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 }
 
 Territory* Map::getTerritory(const std::string& name) {
+  return const_cast<Territory*>(static_cast<const Map&>(*this).getTerritory(name));
+}
+
+const Territory* Map::getTerritory(const std::string& name) const {
   auto iter = territories.find(name);
   if (iter == end(territories)) {
     return nullptr;
@@ -88,7 +92,7 @@ Territory* Map::getTerritory(const std::string& name) {
   return iter->second;
 }
 
-std::map<std::string, Territory*> getTerritories() {
+std::map<std::string, Territory*> Map::getTerritories() const {
   return territories;
 }
     

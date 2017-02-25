@@ -2,15 +2,21 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <thread>
+
+#include "game.h"
 #include "console.h"
 #include "map.h"
+
+void startGame(Game *game);
 
 int main() {
   sf::Vector2<int> window_size(900, 600);
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
-  Console console(5, window_size);
-  Map map("../testboard.txt", sf::Vector2<int>(0,0), sf::Vector2<int>(0,0));
+  Game game(window_size, "../testboard.txt");
+  std::thread game_thread(startGame, &game);
+  game_thread.detach();
 
   while (window.isOpen()) {
     sf::Event event;
@@ -20,22 +26,22 @@ int main() {
       }
       if (event.type == sf::Event::TextEntered) {
 	if (event.text.unicode < 128 && event.text.unicode > 31) {
-	  console.readText(event.text.unicode);
+	  game.getConsole().readText(event.text.unicode);
 	}	  
       }
       if (event.type == sf::Event::KeyPressed) {
 	switch (event.key.code) {
 	case sf::Keyboard::BackSpace:
-	  console.deleteText();
+	  game.getConsole().deleteText();
 	  break;
 	case sf::Keyboard::Return:
-	  console.enterCommand();
+	  game.getConsole().enterCommand();
 	  break;
 	case sf::Keyboard::Up:
-	  console.scroll(true);
+	  game.getConsole().scroll(true);
 	  break;
 	case sf::Keyboard::Down:
-	  console.scroll(false);
+	  game.getConsole().scroll(false);
 	  break;
 	default:
 	  break;
@@ -44,9 +50,13 @@ int main() {
     }
 
     window.clear();
-    window.draw(console);
-    window.draw(map);
+    window.draw(game.getConsole());
+    window.draw(game.getMap());
     window.display();
   }
 
+}
+
+void startGame(Game *game) {
+  game->start();
 }

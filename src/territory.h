@@ -5,6 +5,11 @@
 #include <vector>
 #include <string>
 
+#include "i_agent.h"
+
+// Forward declare IAgent.
+class IAgent;
+
 class Territory : public sf::Drawable {
 private:
   // Game related data members.
@@ -27,11 +32,17 @@ public:
   Territory(const std::string& name, int pos_x, int pos_y);
   void addNeighbor(Territory *territory);
 
-  sf::Vector2f getPosition();
-  const std::string& getName();
+  sf::Vector2f getPosition() const;
+  const std::string& getName() const;
+  bool isOccupied() const;
+  int getOccupierId() const;
+
+  void setOccupier(IAgent *occupier, int units);
 
 private:
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+  void updateUnits(int new_units);
 };
 
 #endif

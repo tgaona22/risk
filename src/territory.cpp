@@ -2,7 +2,7 @@
 
 Territory::Territory(const std::string& name, int pos_x, int pos_y) :
   name(name), 
-  player_id(0),
+  player_id(-1),
   units(0),
   radius(15),
   position(pos_x, pos_y),
@@ -34,11 +34,26 @@ void Territory::addNeighbor(Territory *territory) {
   neighbors.push_back(territory);
 }
 
-sf::Vector2f Territory::getPosition() {
+sf::Vector2f Territory::getPosition() const {
   return position;
 }
 
-const std::string& Territory::getName() {
+const std::string& Territory::getName() const {
   return name;
+}
+
+bool Territory::isOccupied() const {
+  return player_id != -1;
+}
+
+void Territory::setOccupier(IAgent *agent, int units) {
+  player_id = agent->getId();
+  sprite.setFillColor(agent->getColor());
+  updateUnits(units);
+}
+
+void Territory::updateUnits(int new_units) {
+  units = new_units;
+  units_text.setString(std::to_string(units));
 }
   

@@ -7,6 +7,9 @@
 #include <map>
 #include <string>
 
+// Forward declare Territory.
+class Territory;
+
 class Map : public sf::Drawable {
 private:
   //std::vector<Territory*> territories;
@@ -21,7 +24,10 @@ public:
   ~Map();
 
   Territory* getTerritory(const std::string& name);
-  std::map<std::string, Territory*> getTerritories(); // Note: this is copying the map...
+  const Territory* getTerritory(const std::string& name) const;
+  std::map<std::string, Territory*> getTerritories() const; // Note: this is copying the map...
+
+
 
 private:
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
