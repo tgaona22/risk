@@ -7,7 +7,7 @@ HumanAgent::HumanAgent(const Map& map, Console& console, int id) :
 
 HumanAgent::~HumanAgent() {}
 
-const Territory* HumanAgent::selectUnoccupiedTerritory() const {
+const Territory* HumanAgent::selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const {
   std::string territory_name;
   territory_name = console.prompt("Choose an unoccupied territory:");
   const Territory *territory = map.getTerritory(territory_name);

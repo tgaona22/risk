@@ -5,7 +5,7 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x))
 {
   players.push_back(new HumanAgent(map, console, 1));
-  //players.push_back(new RandomAgent(map, 2));
+  players.push_back(new RandomAgent(map, 2));
 }
 
 Game::~Game() {
@@ -28,7 +28,7 @@ void Game::claimTerritories() {
   while (!unoccupied_territories.empty()) {
     IAgent *player = *iter;
     // Ask the player to choose a territory.
-    Territory *territory = askAgentToChooseTerritory(player);
+    Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories);
     // Assign that territory to the player.
     territory->setOccupier(player, 1);
     // Remove the territory from the unoccupied list.
@@ -41,11 +41,11 @@ void Game::claimTerritories() {
   }
 }
 
-Territory* Game::askAgentToChooseTerritory(IAgent *agent) {
+Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::string, Territory*>& unoccupied_territories) {
   // Agent must return an unoccupied territory.
-  Territory *territory = const_cast<Territory*>(agent->selectUnoccupiedTerritory());
+  Territory *territory = const_cast<Territory*>(agent->selectUnoccupiedTerritory(unoccupied_territories));
   while (territory->isOccupied()) {
-    territory = const_cast<Territory*>(agent->selectUnoccupiedTerritory());
+    territory = const_cast<Territory*>(agent->selectUnoccupiedTerritory(unoccupied_territories));
   } 
   return territory;
 }

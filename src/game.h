@@ -6,6 +6,7 @@
 #include "console.h"
 #include "i_agent.h"
 #include "human_agent.h"
+#include "random_agent.h"
 
 #include <vector>
 
@@ -27,7 +28,7 @@ public:
   Console& getConsole() { return console; }
   Map& getMap() { return map; }
 private:
-  Territory* askAgentToChooseTerritory(IAgent *agent);
+  Territory* askAgentToChooseTerritory(IAgent *agent, const std::map<std::string, Territory*>& unoccupied_territories);
 };
 
 #endif
