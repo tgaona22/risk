@@ -38,6 +38,7 @@ public:
   int getOccupierId() const;
 
   void setOccupier(IAgent *occupier, int units);
+  void reinforce(int reinforcements);
 
 private:
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

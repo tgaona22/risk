@@ -15,6 +15,7 @@ int main() {
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
   Game game(window_size, "../testboard.txt");
+  // It is necessary to run the game on a separate thread so the UI doesn't block.
   std::thread game_thread(startGame, &game);
   game_thread.detach();
 
@@ -58,5 +59,5 @@ int main() {
 }
 
 void startGame(Game *game) {
-  game->start();
+  game->run();
 }

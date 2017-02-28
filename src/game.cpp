@@ -14,9 +14,23 @@ Game::~Game() {
   }
 }
 
-bool Game::start() {
+bool Game::run() {
+  // The game starts with players claiming territories until all are taken.
   claimTerritories();
+  auto iter = begin(players);
+  while (!isOver()) {
+    takeTurn(*iter);
+    // Move on to the next player.
+    iter++;
+    if (iter == end(players)) {
+      iter = begin(players);
+    }
+  }
   return true;
+}
+
+bool Game::isOver() {
+  return players.size() == 1;
 }
 
 void Game::claimTerritories() {
@@ -30,7 +44,7 @@ void Game::claimTerritories() {
     // Ask the player to choose a territory.
     Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories);
     // Assign that territory to the player.
-    territory->setOccupier(player, 1);
+    assignTerritoryToAgent(territory, player, 1);
     // Remove the territory from the unoccupied list.
     unoccupied_territories.erase(territory->getName());
     // Move on to the next player.
@@ -41,6 +55,46 @@ void Game::claimTerritories() {
   }
 }
 
+void Game::takeTurn(IAgent *player) {
+  // Player assigns reinforcements.
+  int total_reinforcements = getNumberOfReinforcements(player);
+  Territory *territory;
+  int reinforcements;
+  while (total_reinforcements > 0) {
+    std::tie(territory, reinforcements) = askAgentToReinforce(player, total_reinforcements);
+    territory->reinforce(reinforcements);
+    total_reinforcements = total_reinforcements - reinforcements;
+  }
+
+  // Player attacks.
+
+  // Player maneuvers units.
+}
+
+int Game::getNumberOfReinforcements(IAgent *player) {
+  int reinforcements;
+  int player_territories = player->getNumberOfTerritories();
+  if (player_territories <= 9) { 
+    reinforcements = 3;
+  }
+  else {
+    reinforcements = player_territories / 3;
+  }
+  return reinforcements;
+}
+
+std::tuple<Territory*, int> Game::askAgentToReinforce(IAgent *agent, int total_reinforcements) {
+  const Territory *territory;
+  int reinforcements;
+  std::tie(territory, reinforcements) = agent->reinforce(total_reinforcements);
+  /* Agent must return a territory they occupy and a positive number of units
+     which does not exceed the remaining amount of reinforcements. */
+  while (!agent->hasTerritory(territory) || reinforcements <= 0 || reinforcements > total_reinforcements) {
+    std::tie(territory, reinforcements) = agent->reinforce(total_reinforcements);
+  }
+  return std::make_tuple(const_cast<Territory*>(territory), reinforcements);
+}
+
 Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::string, Territory*>& unoccupied_territories) {
   // Agent must return an unoccupied territory.
   Territory *territory = const_cast<Territory*>(agent->selectUnoccupiedTerritory(unoccupied_territories));
@@ -49,3 +103,13 @@ Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::st
   } 
   return territory;
 }
+
+void Game::assignTerritoryToAgent(Territory *territory, IAgent *agent, int units) {
+  if (territory->isOccupied()) {
+    int old_id = territory->getOccupierId();
+    players.at(old_id)->removeTerritory(territory);
+  }
+  territory->setOccupier(agent, units);
+  agent->addTerritory(territory);
+}
+  

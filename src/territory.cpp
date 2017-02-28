@@ -42,6 +42,10 @@ const std::string& Territory::getName() const {
   return name;
 }
 
+int Territory::getOccupierId() const {
+  return player_id;
+}
+
 bool Territory::isOccupied() const {
   return player_id != -1;
 }
@@ -50,6 +54,10 @@ void Territory::setOccupier(IAgent *agent, int units) {
   player_id = agent->getId();
   sprite.setFillColor(agent->getColor());
   updateUnits(units);
+}
+
+void Territory::reinforce(int reinforcements) {
+  updateUnits(units + reinforcements);
 }
 
 void Territory::updateUnits(int new_units) {

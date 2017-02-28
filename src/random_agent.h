@@ -5,6 +5,11 @@
 #include "map.h"
 #include "territory.h"
 
+#include <tuple>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
 class RandomAgent : public IAgent {
 private:
 public:
@@ -12,6 +17,10 @@ public:
   ~RandomAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const;
+  std::tuple<const Territory*, int> reinforce(int total_reinforcements) const;
+private:
+  const Territory* getRandomTerritory() const;
+  int getRandomInt(int from, int to) const;
 };
 
 #endif

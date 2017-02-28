@@ -16,6 +16,7 @@ public:
   ~HumanAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const;
+  std::tuple<const Territory*, int> reinforce(int total_reinforcements) const;
 };
 
 #endif
