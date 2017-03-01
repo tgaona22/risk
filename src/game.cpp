@@ -1,9 +1,12 @@
 #include "game.h"
 
+const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
+
 Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   console(6, screen_size),
-  map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x))
-{
+  map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
+  first_turn(true)
+{  
   players.push_back(new HumanAgent(map, console, 1));
   players.push_back(new RandomAgent(map, 2));
 }
@@ -17,6 +20,11 @@ Game::~Game() {
 bool Game::run() {
   // The game starts with players claiming territories until all are taken.
   claimTerritories();
+  // Each player distributes their remaining units throughout their owned territories.
+  for (auto iter = begin(players); iter != end(players); iter++) {
+    assignReinforcements(*iter);
+  }
+  // Now each player takes their 3 step turn until the game is over.
   auto iter = begin(players);
   while (!isOver()) {
     takeTurn(*iter);
@@ -57,6 +65,13 @@ void Game::claimTerritories() {
 
 void Game::takeTurn(IAgent *player) {
   // Player assigns reinforcements.
+  assignReinforcements(player);
+  // Player attacks.
+
+  // Player maneuvers units.
+}
+
+void Game::assignReinforcements(IAgent *player) {
   int total_reinforcements = getNumberOfReinforcements(player);
   Territory *territory;
   int reinforcements;
@@ -64,17 +79,17 @@ void Game::takeTurn(IAgent *player) {
     std::tie(territory, reinforcements) = askAgentToReinforce(player, total_reinforcements);
     territory->reinforce(reinforcements);
     total_reinforcements = total_reinforcements - reinforcements;
-  }
-
-  // Player attacks.
-
-  // Player maneuvers units.
+  }  
 }
 
 int Game::getNumberOfReinforcements(IAgent *player) {
-  int reinforcements;
+  int reinforcements = 0;
   int player_territories = player->getNumberOfTerritories();
-  if (player_territories <= 9) { 
+  // On the first turn, each player gets extra units.
+  if (first_turn) {
+    reinforcements = initial_army_size[players.size()] - player_territories;
+  }
+  else if (player_territories <= 9) { 
     reinforcements = 3;
   }
   else {

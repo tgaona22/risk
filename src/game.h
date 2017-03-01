@@ -16,6 +16,9 @@ private:
   std::vector<IAgent*> players;
   Console console;
   Map map;
+
+  bool first_turn;
+  const static int initial_army_size[];
   
 public:
   Game(sf::Vector2<int> screen_size, const std::string& map_file);
@@ -33,6 +36,7 @@ private:
   std::tuple<Territory*, int> askAgentToReinforce(IAgent *agent, int total_reinforcements);
   void assignTerritoryToAgent(Territory *territory, IAgent *agent, int units);
   int getNumberOfReinforcements(IAgent *player);
+  void assignReinforcements(IAgent *player);
 };
 
 #endif
