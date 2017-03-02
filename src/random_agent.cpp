@@ -1,7 +1,9 @@
 #include "random_agent.h"
 
-RandomAgent::RandomAgent(const Map& map, int id) :
-  IAgent(map, id, sf::Color::Red)
+#include <iostream>
+
+RandomAgent::RandomAgent(const Map& map, int id, sf::Color color) :
+  IAgent(map, id, color)
 {
   // Seed the random number generator.
   std::srand((unsigned)std::time(0));
@@ -21,10 +23,22 @@ std::tuple<const Territory*, int> RandomAgent::reinforce(int total_reinforcement
 }
 
 std::tuple<const Territory*, const Territory*, int> RandomAgent::attack() const {
-  if ((rand() % 100) <= 20) {
+  // If there is no territory with more than one unit, agent must pass.
+  bool pass = true;
+  std::vector<const Territory*> possible_attackers;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    const Territory *current_territory = iter->second;
+    if (current_territory->getUnits() > 1) {
+      possible_attackers.push_back(current_territory);
+      pass = false;
+    }
+  }
+  if (pass || (rand() % 100) <= 20) {
     return std::make_tuple(nullptr, nullptr, 0);
   }
-  const Territory *from = getRandomTerritory();
+
+  const Territory *from = possible_attackers.at(getRandomInt(0, possible_attackers.size() - 1));
+
   const std::vector<Territory*>& neighbors = from->getNeighbors();
   const Territory *to = neighbors.at(getRandomInt(0, neighbors.size() - 1));
   int max_units = ((from->getUnits() - 1) < 3) ? from->getUnits() - 1 : 3;

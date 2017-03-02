@@ -12,7 +12,7 @@ class HumanAgent : public IAgent {
 private:
   Console& console;
 public:
-  HumanAgent(const Map& map, Console& console, int id);
+  HumanAgent(const Map& map, Console& console, int id, sf::Color color);
   ~HumanAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const;

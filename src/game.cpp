@@ -2,15 +2,17 @@
 
 #include <iostream>
 
-const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
+//const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
+const int Game::initial_army_size[] = {0, 0, 5, 5, 5, 5};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   console(6, screen_size),
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
   first_turn(true)
 {  
-  players.push_back(new HumanAgent(map, console, 0));
-  players.push_back(new RandomAgent(map, 1));
+  //players.push_back(new HumanAgent(map, console, 0, sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 0, sf::Color::Red));
+  players.push_back(new RandomAgent(map, 1, sf::Color::Green));
 }
 
 Game::~Game() {
@@ -31,6 +33,8 @@ bool Game::run() {
   auto iter = begin(players);
   while (!isOver()) {
     takeTurn(*iter);
+    // Wait a bit.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     // Move on to the next player.
     iter++;
     if (iter == end(players)) {
@@ -202,9 +206,12 @@ std::tuple<Territory*, Territory*, int> Game::askAgentToAttack(IAgent *agent) {
      The attacker can roll 1, 2, or 3 dice but must have at least one more unit in the attacking
      territory than the number of dice rolled. */
   while (agent->hasTerritory(to) || !agent->hasTerritory(from) || !from->hasNeighbor(to) ||
-	 attacking_units < 1 || attacking_units > 3 || from->getUnits() <= attacking_units) 
+	 attacking_units < 1 || attacking_units > 3 || from->getUnits() <= attacking_units || from->getUnits() <= 1) 
     {
       std::tie(to, from, attacking_units) = agent->attack();
+      if (to == nullptr) { 
+	return std::make_tuple(nullptr, nullptr, 0);
+      }
     }
   std::cout << "Attacking " << to->getName() << " from " << from->getName() << "\n";
   return std::make_tuple(const_cast<Territory*>(to), const_cast<Territory*>(from), attacking_units);

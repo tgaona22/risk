@@ -1,9 +1,7 @@
 #include "human_agent.h"
 
-#include <iostream>
-
-HumanAgent::HumanAgent(const Map& map, Console& console, int id) :
-  IAgent(map, id, sf::Color::Blue),
+HumanAgent::HumanAgent(const Map& map, Console& console, int id, sf::Color color) :
+  IAgent(map, id, color),
   console(console)
 {}
 
@@ -56,9 +54,7 @@ std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() const {
   std::string prompt_msg = "Select a territory to attack. (Type 'pass' to stop attacking).";
   to_name = console.prompt(prompt_msg);
 
-  std::cout << "Human says " << to_name << "\n";
   if (to_name.compare("pass") == 0) {
-    std::cout << "Human trys to pass\n.";
     return std::make_tuple(nullptr, nullptr, 0);
   }
 
@@ -81,7 +77,7 @@ std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() const {
   prompt_msg = "Where are you attacking from?";
   from_name = console.prompt(prompt_msg);
   const Territory *from = map.getTerritory(from_name);
-  while (from == nullptr || !hasTerritory(from) || !from->hasNeighbor(to)) {
+  while (from == nullptr || !hasTerritory(from) || !from->hasNeighbor(to) || from->getUnits() == 1) {
     std::string err_msg;
     if (from == nullptr) {
       err_msg = from_name + " is not a territory!";
@@ -91,6 +87,9 @@ std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() const {
     }
     else if (!from->hasNeighbor(to)) {
       err_msg = from_name + " is not adjacent to " + to_name + "!";
+    }
+    else if (from->getUnits() == 1) {
+      err_msg = "You cannot attack from a territory that only has one unit!";
     }
     from_name = console.prompt(err_msg + " " + prompt_msg);
     from = map.getTerritory(from_name);

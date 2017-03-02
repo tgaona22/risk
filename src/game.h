@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <tuple>
+#include <thread>
+#include <chrono>
 
 class Game {
 private:
