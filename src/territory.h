@@ -34,8 +34,11 @@ public:
 
   sf::Vector2f getPosition() const;
   const std::string& getName() const;
+  const std::vector<Territory*>& getNeighbors() const;
+  int getUnits() const;
   bool isOccupied() const;
   int getOccupierId() const;
+  bool hasNeighbor(const Territory *territory) const;
 
   void setOccupier(IAgent *occupier, int units);
   void reinforce(int reinforcements);

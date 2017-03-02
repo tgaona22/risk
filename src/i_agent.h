@@ -22,15 +22,19 @@ public:
   int getId() const;
   int getNumberOfTerritories() const;
   bool hasTerritory(const Territory *territory) const;
+  bool canAttack(const Territory *territory) const;
   void addTerritory(const Territory *territory);
   void removeTerritory(const Territory *territory);
   const sf::Color& getColor() const;
 
   virtual const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const = 0;
   virtual std::tuple<const Territory*, int> reinforce(int total_reinforcements) const = 0;
-  //virtual int attack(Territory *from, Territory *to) = 0;
+  virtual std::tuple<const Territory*, const Territory*, int> attack() const = 0;
+  virtual int defend(const Territory *attacker, const Territory *defender, int attacking_units) const = 0;
+  virtual int capture(const Territory *from, const Territory *to_capture, int attacking_units) const = 0;
   //virtual int maneuver(Territory *from, Territory *to) = 0;
-  
+protected:
+
 };
 
 #endif

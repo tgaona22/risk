@@ -32,8 +32,17 @@ public:
 private:
   void claimTerritories();
   void takeTurn(IAgent *player);
+  
   Territory* askAgentToChooseTerritory(IAgent *agent, const std::map<std::string, Territory*>& unoccupied_territories);
   std::tuple<Territory*, int> askAgentToReinforce(IAgent *agent, int total_reinforcements);
+  std::tuple<Territory*, Territory*, int> askAgentToAttack(IAgent *agent);
+  int askAgentToDefend(IAgent *agent, Territory *defender, Territory *attacker, int attacking_units);
+  int askAgentToCapture(IAgent *agent, Territory *from, Territory *to, int attacking_units);
+
+  void resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units);
+  int rollDie();
+  int findMax(int *arr, int size);
+
   void assignTerritoryToAgent(Territory *territory, IAgent *agent, int units);
   int getNumberOfReinforcements(IAgent *player);
   void assignReinforcements(IAgent *player);

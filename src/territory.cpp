@@ -42,12 +42,29 @@ const std::string& Territory::getName() const {
   return name;
 }
 
+const std::vector<Territory*>& Territory::getNeighbors() const {
+  return neighbors;
+}
+
 int Territory::getOccupierId() const {
   return player_id;
 }
 
+int Territory::getUnits() const {
+  return units;
+}
+
 bool Territory::isOccupied() const {
   return player_id != -1;
+}
+
+bool Territory::hasNeighbor(const Territory *territory) const {
+  for (auto iter = begin(neighbors); iter != end(neighbors); iter++) {
+    if (territory == *iter) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Territory::setOccupier(IAgent *agent, int units) {
