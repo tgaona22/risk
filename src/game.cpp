@@ -11,8 +11,9 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   first_turn(true)
 {  
   //players.push_back(new HumanAgent(map, console, 0, sf::Color::Blue));
-  players.push_back(new RandomAgent(map, 0, sf::Color::Red));
-  players.push_back(new RandomAgent(map, 1, sf::Color::Green));
+  players.push_back(new RandomAgent(map, 0, sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 1, sf::Color::Magenta));
+  players.push_back(new RandomAgent(map, 2, sf::Color::Red));
 }
 
 Game::~Game() {
@@ -32,9 +33,13 @@ bool Game::run() {
   // Now each player takes their 3 step turn until the game is over.
   auto iter = begin(players);
   while (!isOver()) {
-    takeTurn(*iter);
-    // Wait a bit.
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // Player can only take their turn if they haven't lost - ie they still control territories.
+    IAgent *player = *iter;
+    if (player->getNumberOfTerritories() > 0) {
+      takeTurn(*iter);
+      // Wait a bit.
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     // Move on to the next player.
     iter++;
     if (iter == end(players)) {
@@ -149,9 +154,12 @@ void Game::assignReinforcements(IAgent *player) {
   int total_reinforcements = getNumberOfReinforcements(player);
   Territory *territory;
   int reinforcements;
+
   while (total_reinforcements > 0) {
+    //std::cout << "Player " << player->getId() << " has " << total_reinforcements << " reinforcements.\n";
     std::tie(territory, reinforcements) = askAgentToReinforce(player, total_reinforcements);
     territory->reinforce(reinforcements);
+    //std::cout << "Player " << player->getId() << " places " << reinforcements << " units in " << territory->getName() << ".\n";
     total_reinforcements = total_reinforcements - reinforcements;
   }  
 }
