@@ -1,12 +1,10 @@
 #include "game.h"
 
-#include <iostream>
-
 //const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
 const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
-  console(6, screen_size),
+  console(12, screen_size),
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
   first_turn(true)
 {  
@@ -37,8 +35,6 @@ bool Game::run() {
     IAgent *player = *iter;
     if (player->getNumberOfTerritories() > 0) {
       takeTurn(*iter);
-      // Wait a bit.
-      std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     // Move on to the next player.
     iter++;
@@ -68,6 +64,7 @@ void Game::claimTerritories() {
     // Remove the territory from the unoccupied list.
     unoccupied_territories.erase(territory->getName());
     // Move on to the next player.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     iter++;
     if (iter == end(players)) {
       iter = begin(players);
@@ -79,6 +76,8 @@ void Game::takeTurn(IAgent *player) {
   // Player assigns reinforcements.
   assignReinforcements(player);
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
   // Player attacks.
   Territory *to, *from;
   int attacking_units;
@@ -87,19 +86,28 @@ void Game::takeTurn(IAgent *player) {
     std::tie(to, from, attacking_units) = askAgentToAttack(player);
     if (to != nullptr) {
       IAgent *defender = players.at(to->getOccupierId());
-      std::cout << defender->getId() << " is defending.\n";
       int defending_units = askAgentToDefend(defender, to, from, attacking_units);
-      std::cout << "Defending with " << defending_units << " units.\n";
+      console.inform("Player " + std::to_string(player->getId()) + " attacks " + to->getName() 
+		     + " from " + from->getName() + " with " + std::to_string(attacking_units) 
+		     + " units. Player " + std::to_string(defender->getId()) + " defends with "
+		     + std::to_string(defending_units) + " units.");
       resolveBattle(from, to, attacking_units, defending_units);
     }
   } while (to != nullptr); 
-  std::cout << "Player " << player->getId() << " ends their turn.\n";
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   
   // Player fortifies.
   int fortifying_units;
   std::tie(to, from, fortifying_units) = askAgentToFortify(player);
-  from->reinforce(-fortifying_units);
-  to->reinforce(fortifying_units);
+  if (to != nullptr) {
+    from->reinforce(-fortifying_units);
+    to->reinforce(fortifying_units);
+    console.inform("Player " + std::to_string(player->getId()) + " moves " + std::to_string(fortifying_units) 
+		   + " units from " + from->getName() + " to " + to->getName() + ".");
+  }
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units) {
@@ -108,11 +116,9 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
   // Roll the dice.
   for (int i = 0; i < attacking_units; i++) {
     attacker_dice[i] = rollDie();
-    std::cout << "Attacker rolls " << attacker_dice[i] << ".\n";
   }
   for (int i = 0; i < defending_units; i++) {
     defender_dice[i] = rollDie();
-    std::cout << "Defender rolls " << defender_dice[i] << ".\n";
   }
 
   int count = 0;
@@ -122,15 +128,16 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
     // Find the greatest dice roll for each player.
     int attacker_index = findMax(attacker_dice, attacking_units);
     int defender_index = findMax(defender_dice, defending_units);
-    std::cout << "Attacker's best roll is " << attacker_dice[attacker_index] 
-	      << "and defender's best roll is " << defender_dice[defender_index] << ".\n";
+    console.inform("Player " + std::to_string(attacker->getOccupierId()) + "'s best dice roll is "
+		   + std::to_string(attacker_dice[attacker_index]) + " and Player " + std::to_string(defender->getOccupierId()) 
+		   + "'s best roll is " + std::to_string(defender_dice[defender_index]));
     // The defender wins in case of tie.
     if (attacker_dice[attacker_index] > defender_dice[defender_index]) {
-      std::cout << "Attacker wins\n";
+      console.inform("Player " + std::to_string(attacker->getOccupierId()) + " wins the battle.");
       defender_loss += 1;
     }
     else { 
-      std::cout << "Defender wins\n";
+      console.inform("Player " + std::to_string(defender->getOccupierId()) + " wins the battle.");
       attacker_loss += 1;
     }
     // Discard the two highest dice for the next comparison.
@@ -148,6 +155,8 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
 
   // If the defender lost all their units, the attacker captures the territory.
   if (defender->getUnits() == 0) {
+    console.inform("Player " + std::to_string(attacker->getOccupierId()) + " captures " + defender->getName() 
+		   + " from Player " + std::to_string(defender->getOccupierId()) + "!");
     IAgent *attacking_agent = players.at(attacker->getOccupierId());
     int capturing_units = askAgentToCapture(attacking_agent, attacker, defender, attacking_units - attacker_loss);
     assignTerritoryToAgent(defender, attacking_agent, capturing_units);
@@ -161,11 +170,11 @@ void Game::assignReinforcements(IAgent *player) {
   int reinforcements;
 
   while (total_reinforcements > 0) {
-    //std::cout << "Player " << player->getId() << " has " << total_reinforcements << " reinforcements.\n";
     std::tie(territory, reinforcements) = askAgentToReinforce(player, total_reinforcements);
     territory->reinforce(reinforcements);
-    //std::cout << "Player " << player->getId() << " places " << reinforcements << " units in " << territory->getName() << ".\n";
     total_reinforcements = total_reinforcements - reinforcements;
+    console.inform("Player " + std::to_string(player->getId()) + " reinforces " + territory->getName() 
+		   + " with " + std::to_string(reinforcements) + " units.");
   }  
 }
 
@@ -207,7 +216,6 @@ Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::st
 }
 
 std::tuple<Territory*, Territory*, int> Game::askAgentToAttack(IAgent *agent) {
-  std::cout << "Agent " << agent->getId() << " is attacking.\n";
   const Territory *to, *from;
   int attacking_units;
   std::tie(to, from, attacking_units) = agent->attack();
@@ -226,7 +234,6 @@ std::tuple<Territory*, Territory*, int> Game::askAgentToAttack(IAgent *agent) {
 	return std::make_tuple(nullptr, nullptr, 0);
       }
     }
-  std::cout << "Attacking " << to->getName() << " from " << from->getName() << "\n";
   return std::make_tuple(const_cast<Territory*>(to), const_cast<Territory*>(from), attacking_units);
 }
 
@@ -234,7 +241,6 @@ int Game::askAgentToDefend(IAgent *agent, Territory *defender, Territory *attack
   /* Agent may roll either 1 or 2 dice, but must have at least as many units 
      in the territory as the number of dice being rolled. */
   int defending_units = agent->defend(attacker, defender, attacking_units);
-  std::cout << "Trying to defend with " << defending_units << " units.\n";
   while (defending_units < 1 || defending_units > 2 || defender->getUnits() < defending_units) {
     defending_units = agent->defend(attacker, defender, attacking_units);
   }

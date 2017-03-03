@@ -57,6 +57,10 @@ std::string Console::prompt(const std::string& msg) {
   return latest_command;
 }
 
+void Console::inform(const std::string& msg) {
+  addToLog(msg, sf::Color::White);
+}
+
 void Console::addToLog(const std::string& msg, sf::Color color = sf::Color::Green) {
   log_offset = 0;
   sf::Text *msg_text = new sf::Text(msg, font, font_size);

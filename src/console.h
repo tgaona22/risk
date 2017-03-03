@@ -27,6 +27,7 @@ public:
   ~Console();
 
   std::string prompt(const std::string& msg);
+  void inform(const std::string& msg);
 
   // Interface for use by the main event-handling loop.
   void readText(int character);

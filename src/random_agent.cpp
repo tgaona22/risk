@@ -65,6 +65,10 @@ std::tuple<const Territory*, const Territory*, int> RandomAgent::fortify() const
     }
   }
 
+  if (possible_fortifiers.size() == 0 || (rand() % 100) <= 20) {
+    return std::make_tuple(nullptr, nullptr, 0);
+  }
+
   const Territory *to, *from; 
   from = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
   to = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
