@@ -146,3 +146,59 @@ int HumanAgent::capture(const Territory *from, const Territory *to_capture, int 
   }
   return capturing_units;
 }
+
+std::tuple<const Territory*, const Territory*, int> HumanAgent::fortify() const {
+  std::string prompt_msg = "What territory do you want to fortify? (Type 'pass' to skip this phase)";
+
+  std::string to_name = console.prompt(prompt_msg);
+
+  if (to_name.compare("pass") == 0) {
+    return std::make_tuple(nullptr, nullptr, 0);
+  }
+
+  const Territory *to = map.getTerritory(to_name);
+  while (to == nullptr || !hasTerritory(to)) {
+    std::string err_msg;
+    if (to == nullptr) {
+      err_msg = to_name + " is not a territory!";
+    }
+    else {
+      err_msg = "You don't own " + to_name + "!";
+    }
+    to_name = console.prompt(err_msg + " " + prompt_msg);
+    to = map.getTerritory(to_name);
+  }
+
+  prompt_msg = "What territory are you fortifying from?";
+  std::string from_name = console.prompt(prompt_msg);
+  const Territory *from = map.getTerritory(from_name);
+  while (from == nullptr || !hasTerritory(from) || from->getUnits() == 1) {
+    std::string err_msg;
+    if (from == nullptr) {
+      err_msg = from_name + " is not a territory!";
+    }
+    else if (!hasTerritory(from)) {
+      err_msg = "You don't own " + from_name + "!";
+    }
+    else {
+      err_msg = "You can't move units from a territory that only has one unit!";
+    }
+    from_name = console.prompt(err_msg + " " + prompt_msg);
+    from = map.getTerritory(from_name);
+  }
+
+  prompt_msg = "How many units will you move?";
+  int fortifying_units = std::stoi(console.prompt(prompt_msg));
+  while (fortifying_units < 1 || fortifying_units >= from->getUnits()) {
+    std::string err_msg;
+    if (fortifying_units < 1) {
+      err_msg = "You must move at least one unit!";
+    }
+    else {
+      err_msg = from_name + " only has " + std::to_string(from->getUnits()) + " units!";
+    }
+    fortifying_units = std::stoi(console.prompt(err_msg + " " + prompt_msg));
+  }
+
+  return std::make_tuple(to, from, fortifying_units);
+}

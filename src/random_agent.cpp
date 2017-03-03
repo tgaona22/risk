@@ -56,6 +56,22 @@ int RandomAgent::capture(const Territory *from, const Territory *to_capture, int
   return getRandomInt(attacking_units, max_units);
 }
 
+std::tuple<const Territory*, const Territory*, int> RandomAgent::fortify() const {
+  std::vector<const Territory*> possible_fortifiers;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    const Territory *current_territory = iter->second;
+    if (current_territory->getUnits() > 1) {
+      possible_fortifiers.push_back(current_territory);
+    }
+  }
+
+  const Territory *to, *from; 
+  from = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
+  to = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
+  int fortifying_units = getRandomInt(1, from->getUnits() - 1);
+  return std::make_tuple(to, from, fortifying_units);
+}
+
 const Territory* RandomAgent::getRandomTerritory() const {
   std::vector<std::string> names;
   for (auto iter = begin(territories); iter != end(territories); iter++) {
@@ -69,4 +85,3 @@ const Territory* RandomAgent::getRandomTerritory() const {
 int RandomAgent::getRandomInt(int from, int to) const {
   return (rand() % (to - from + 1)) + from;
 }
-

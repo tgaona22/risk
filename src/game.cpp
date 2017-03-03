@@ -3,7 +3,7 @@
 #include <iostream>
 
 //const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
-const int Game::initial_army_size[] = {0, 0, 5, 5, 5, 5};
+const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   console(6, screen_size),
@@ -11,7 +11,7 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   first_turn(true)
 {  
   //players.push_back(new HumanAgent(map, console, 0, sf::Color::Blue));
-  players.push_back(new RandomAgent(map, 0, sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 0, sf::Color::Cyan));
   players.push_back(new RandomAgent(map, 1, sf::Color::Magenta));
   players.push_back(new RandomAgent(map, 2, sf::Color::Red));
 }
@@ -78,6 +78,7 @@ void Game::claimTerritories() {
 void Game::takeTurn(IAgent *player) {
   // Player assigns reinforcements.
   assignReinforcements(player);
+
   // Player attacks.
   Territory *to, *from;
   int attacking_units;
@@ -94,7 +95,11 @@ void Game::takeTurn(IAgent *player) {
   } while (to != nullptr); 
   std::cout << "Player " << player->getId() << " ends their turn.\n";
   
-  // Player maneuvers units.
+  // Player fortifies.
+  int fortifying_units;
+  std::tie(to, from, fortifying_units) = askAgentToFortify(player);
+  from->reinforce(-fortifying_units);
+  to->reinforce(fortifying_units);
 }
 
 void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units) {
@@ -244,6 +249,26 @@ int Game::askAgentToCapture(IAgent *agent, Territory *from, Territory *to, int a
     capturing_units = agent->capture(from, to, attacking_units);
   }
   return capturing_units;
+}
+
+std::tuple<Territory*, Territory*, int> Game::askAgentToFortify(IAgent *agent) {
+  /* Agent must return a territory they own, another territory they own, and a number 
+     that is strictly less than the number of units in the territory being moved from.
+     If the agent does not wish to fortify, it should return nullptr for the territories. */
+  // TODO: The rules state there should be a path between the two territories. Need to implement this functionality in Map class.
+  const Territory *to, *from;
+  int fortifying_units;
+  std::tie(to, from, fortifying_units) = agent->fortify();
+  if (to == nullptr) {
+    return std::make_tuple(nullptr, nullptr, 0);
+  }
+  while (!agent->hasTerritory(to) || !agent->hasTerritory(from) || from->getUnits() <= fortifying_units) {
+    std::tie(to, from, fortifying_units) = agent->fortify();
+    if (to == nullptr) {
+      return std::make_tuple(nullptr, nullptr, 0);
+    }
+  }
+  return std::make_tuple(const_cast<Territory*>(to), const_cast<Territory*>(from), fortifying_units);
 }
 
 void Game::assignTerritoryToAgent(Territory *territory, IAgent *agent, int units) {

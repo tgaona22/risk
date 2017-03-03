@@ -20,6 +20,7 @@ public:
   std::tuple<const Territory*, const Territory*, int> attack() const;
   int defend(const Territory *attacker, const Territory *defender, int attacking_units) const;
   int capture(const Territory *from, const Territory *to_capture, int attacking_units) const;
+  std::tuple<const Territory*, const Territory*, int> fortify() const;
 
 };
 

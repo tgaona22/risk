@@ -40,6 +40,7 @@ private:
   std::tuple<Territory*, Territory*, int> askAgentToAttack(IAgent *agent);
   int askAgentToDefend(IAgent *agent, Territory *defender, Territory *attacker, int attacking_units);
   int askAgentToCapture(IAgent *agent, Territory *from, Territory *to, int attacking_units);
+  std::tuple<Territory*, Territory*, int> askAgentToFortify(IAgent *agent);
 
   void resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units);
   int rollDie();
