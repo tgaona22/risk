@@ -7,6 +7,7 @@
 #include "i_agent.h"
 #include "human_agent.h"
 #include "random_agent.h"
+#include "planning_agent.h"
 
 #include <vector>
 #include <tuple>

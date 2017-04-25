@@ -9,9 +9,8 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   first_turn(true)
 {  
   //players.push_back(new HumanAgent(map, console, 0, sf::Color::Blue));
-  players.push_back(new RandomAgent(map, 0, sf::Color::Cyan));
-  players.push_back(new RandomAgent(map, 1, sf::Color::Magenta));
-  players.push_back(new RandomAgent(map, 2, sf::Color::Red));
+  players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 1, sf::Color::Red));
 }
 
 Game::~Game() {
