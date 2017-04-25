@@ -14,7 +14,7 @@ int main() {
   sf::Vector2<int> window_size(900, 600);
   sf::RenderWindow window(sf::VideoMode(window_size.x, window_size.y), "RISK");
 
-  Game game(window_size, "../testboard.txt");
+  Game game(window_size, "../testboard2.txt");
   // It is necessary to run the game on a separate thread so the UI doesn't block.
   std::thread game_thread(startGame, &game);
   game_thread.detach();

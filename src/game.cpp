@@ -59,6 +59,7 @@ void Game::claimTerritories() {
     IAgent *player = *iter;
     // Ask the player to choose a territory.
     Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories);
+    console.inform("Player " + std::to_string(player->getId()) + " takes " + territory->getName());
     // Assign that territory to the player.
     assignTerritoryToAgent(territory, player, 1);
     // Remove the territory from the unoccupied list.
