@@ -27,7 +27,7 @@ std::tuple<const Territory*, const Territory*, int> RandomAgent::attack() const 
   bool pass = true;
   std::vector<const Territory*> possible_attackers;
   for (auto iter = begin(territories); iter != end(territories); iter++) {
-    const Territory *current_territory = iter->second;
+    const Territory *current_territory = *iter;
     if (current_territory->getUnits() > 1) {
       possible_attackers.push_back(current_territory);
       pass = false;
@@ -59,7 +59,7 @@ int RandomAgent::capture(const Territory *from, const Territory *to_capture, int
 std::tuple<const Territory*, const Territory*, int> RandomAgent::fortify() const {
   std::vector<const Territory*> possible_fortifiers;
   for (auto iter = begin(territories); iter != end(territories); iter++) {
-    const Territory *current_territory = iter->second;
+    const Territory *current_territory = *iter;
     if (current_territory->getUnits() > 1) {
       possible_fortifiers.push_back(current_territory);
     }
@@ -77,13 +77,7 @@ std::tuple<const Territory*, const Territory*, int> RandomAgent::fortify() const
 }
 
 const Territory* RandomAgent::getRandomTerritory() const {
-  std::vector<std::string> names;
-  for (auto iter = begin(territories); iter != end(territories); iter++) {
-    names.push_back(iter->first);
-  }
-  // Select a random territory. 
-  int index = getRandomInt(0, territories.size() - 1);
-  return (territories.find(names.at(index)))->second;
+  return territories.at(getRandomInt(0, territories.size() - 1));
 }
 
 int RandomAgent::getRandomInt(int from, int to) const {

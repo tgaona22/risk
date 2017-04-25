@@ -14,7 +14,7 @@ bool IAgent::hasTerritory(const Territory *territory) const {
 
 bool IAgent::canAttack(const Territory *territory) const {
   for (auto iter = begin(territories); iter != end(territories); iter++) {
-    const Territory *current_territory = iter->second;
+    const Territory *current_territory = *iter;
     if (current_territory->hasNeighbor(territory)) {
       return true;
     }
@@ -23,11 +23,15 @@ bool IAgent::canAttack(const Territory *territory) const {
 }
 
 void IAgent::addTerritory(const Territory *territory) {
-  territories.insert(std::pair<std::string, const Territory*>(territory->getName(), territory));
+  territories.push_back(territory);
 }
 
 void IAgent::removeTerritory(const Territory *territory) {
-  territories.erase(territory->getName());
+  auto iter = begin(territories);
+  while ((*iter) != territory) {
+    iter++;
+  }
+  territories.erase(iter);
 }
 
 const sf::Color& IAgent::getColor() const { 

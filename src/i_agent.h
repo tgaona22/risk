@@ -12,7 +12,7 @@ class Territory;
 class IAgent {
 protected:
   const Map& map;
-  std::map<std::string, const Territory*> territories;
+  std::vector<const Territory*> territories;
   int id;
   sf::Color color;
 public:
