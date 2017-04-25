@@ -27,12 +27,12 @@ public:
   void removeTerritory(const Territory *territory);
   const sf::Color& getColor() const;
 
-  virtual const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const = 0;
-  virtual std::tuple<const Territory*, int> reinforce(int total_reinforcements) const = 0;
-  virtual std::tuple<const Territory*, const Territory*, int> attack() const = 0;
-  virtual int defend(const Territory *attacker, const Territory *defender, int attacking_units) const = 0;
-  virtual int capture(const Territory *from, const Territory *to_capture, int attacking_units) const = 0;
-  virtual std::tuple<const Territory*, const Territory*, int> fortify() const = 0;
+  virtual const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) = 0;
+  virtual std::tuple<const Territory*, int> reinforce(int total_reinforcements) = 0;
+  virtual std::tuple<const Territory*, const Territory*, int> attack() = 0;
+  virtual int defend(const Territory *attacker, const Territory *defender, int attacking_units) = 0;
+  virtual int capture(const Territory *from, const Territory *to_capture, int attacking_units) = 0;
+  virtual std::tuple<const Territory*, const Territory*, int> fortify() = 0;
 protected:
 
 };

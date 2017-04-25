@@ -7,7 +7,7 @@ HumanAgent::HumanAgent(const Map& map, Console& console, int id, sf::Color color
 
 HumanAgent::~HumanAgent() {}
 
-const Territory* HumanAgent::selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) const {
+const Territory* HumanAgent::selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) {
   std::string territory_name;
   territory_name = console.prompt("Choose an unoccupied territory:");
   const Territory *territory = map.getTerritory(territory_name);
@@ -21,7 +21,7 @@ const Territory* HumanAgent::selectUnoccupiedTerritory(const std::map<std::strin
   return territory;
 }
 
-std::tuple<const Territory*, int> HumanAgent::reinforce(int total_reinforcements) const {
+std::tuple<const Territory*, int> HumanAgent::reinforce(int total_reinforcements) {
   std::string territory_name;
   std::string prompt_msg = "You have " + std::to_string(total_reinforcements) + " reinforcements available."
     + " What territory would you like to reinforce?";
@@ -49,7 +49,7 @@ std::tuple<const Territory*, int> HumanAgent::reinforce(int total_reinforcements
   return std::make_tuple(territory, reinforcements);
 }
 
-std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() const {
+std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() {
   std::string to_name, from_name;
   std::string prompt_msg = "Select a territory to attack. (Type 'pass' to stop attacking).";
   to_name = console.prompt(prompt_msg);
@@ -114,7 +114,7 @@ std::tuple<const Territory*, const Territory*, int> HumanAgent::attack() const {
   return std::make_tuple(to, from, attacking_units);
 }
 
-int HumanAgent::defend(const Territory *attacker, const Territory *defender, int attacking_units) const {
+int HumanAgent::defend(const Territory *attacker, const Territory *defender, int attacking_units) {
   std::string prompt_msg = defender->getName() + " is being attacked from " + attacker->getName() + " by "
     + std::to_string(attacking_units) + " units! How many units will defend?";
   int defending_units = std::stoi(console.prompt(prompt_msg));
@@ -131,7 +131,7 @@ int HumanAgent::defend(const Territory *attacker, const Territory *defender, int
   return defending_units;
 }
 
-int HumanAgent::capture(const Territory *from, const Territory *to_capture, int attacking_units) const {
+int HumanAgent::capture(const Territory *from, const Territory *to_capture, int attacking_units) {
   std::string prompt_msg = "You have captured " + to_capture->getName() + "! How many units will you move in?";
   int capturing_units = std::stoi(console.prompt(prompt_msg));
   while (capturing_units < attacking_units || capturing_units >= from->getUnits()) {
@@ -147,7 +147,7 @@ int HumanAgent::capture(const Territory *from, const Territory *to_capture, int 
   return capturing_units;
 }
 
-std::tuple<const Territory*, const Territory*, int> HumanAgent::fortify() const {
+std::tuple<const Territory*, const Territory*, int> HumanAgent::fortify() {
   std::string prompt_msg = "What territory do you want to fortify? (Type 'pass' to skip this phase)";
 
   std::string to_name = console.prompt(prompt_msg);
