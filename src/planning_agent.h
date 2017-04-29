@@ -34,6 +34,8 @@ public:
   int capture(const Territory *from, const Territory *to_capture, int attacking_units);
   std::tuple<const Territory*, const Territory*, int> fortify();
 
+  void informOfBattleOutcome(int attacker_id, int defender_id, int attacker_lost, int defender_lost, bool captured);
+
 private:
   void allocateReinforcements(int total_reinforcements);
   void selectTarget();

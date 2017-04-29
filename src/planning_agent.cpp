@@ -61,13 +61,15 @@ std::tuple<const Territory*, const Territory*, int> PlanningAgent::attack() {
     }
   }
   
-  int attacking_units = std::min(unit_budget, std::min(3, attacker->getUnits()));
-  unit_budget = unit_budget - attacking_units;
+  int attacking_units = std::min(unit_budget, std::min(3, attacker->getUnits() - 1));
+  // In the informOfBattleOutcome method we update the unit budget with the number of lost troops.  
+  std::cout << "Planner tries to attack " << attack_target->getName() << " from " 
+	    << attacker->getName() << " with " << attacking_units << " units.\n";
   return std::make_tuple(attack_target, attacker, attacking_units);
 }
 
 int PlanningAgent::defend(const Territory *attacker, const Territory *defender, int attacking_units) {
-  return randy.defend(attacker, defender, attacking_units);
+  return getRandomInt(1, std::min(2, defender->getUnits()));
 }
 
 int PlanningAgent::capture(const Territory *from, const Territory *to_capture, int attacking_units) {
@@ -76,6 +78,13 @@ int PlanningAgent::capture(const Territory *from, const Territory *to_capture, i
 
 std::tuple<const Territory*, const Territory*, int> PlanningAgent::fortify() {
   return randy.fortify();
+}
+
+void PlanningAgent::informOfBattleOutcome(int attacker_id, int defender_id, int attacker_lost, int defender_lost, bool captured) {
+  if (attacker_id == id) {
+    unit_budget = unit_budget - attacker_lost;
+    std::cout << "Informed of battle outcome: we lost " << attacker_lost << " units. unit_budget = " << unit_budget << std::endl;
+  }
 }
 
 void PlanningAgent::selectTarget() {

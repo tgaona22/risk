@@ -1,5 +1,8 @@
 #include "game.h"
 
+// Testing...
+#include <iostream>
+
 //const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
 const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
 
@@ -9,8 +12,8 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   first_turn(true)
 { 
   players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
-  players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
-  //players.push_back(new RandomAgent(map, 0, sf::Color::Red));
+  //players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
+  players.push_back(new RandomAgent(map, 1, sf::Color::Magenta));
 }
 
 Game::~Game() {
@@ -162,6 +165,12 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
     assignTerritoryToAgent(defender, attacking_agent, capturing_units);
     attacker->reinforce(-capturing_units);
   }
+
+  // Inform the attacker and defender of the outcome.
+  players.at(attacker->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(),
+							       attacker_loss, defender_loss, defender->getUnits() == 0);
+  players.at(defender->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(),
+							       attacker_loss, defender_loss, defender->getUnits() == 0);
 }
 
 void Game::assignReinforcements(IAgent *player) {
@@ -216,6 +225,8 @@ Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::st
 }
 
 std::tuple<Territory*, Territory*, int> Game::askAgentToAttack(IAgent *agent) {
+  std::cout << "Asking " << agent->getId() << " to attack.\n";
+  
   const Territory *to, *from;
   int attacking_units;
   std::tie(to, from, attacking_units) = agent->attack();

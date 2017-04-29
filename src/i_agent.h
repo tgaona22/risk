@@ -33,6 +33,9 @@ public:
   virtual int defend(const Territory *attacker, const Territory *defender, int attacking_units) = 0;
   virtual int capture(const Territory *from, const Territory *to_capture, int attacking_units) = 0;
   virtual std::tuple<const Territory*, const Territory*, int> fortify() = 0;
+
+  virtual void informOfBattleOutcome(int attacker_id, int defender_id, int attacker_lost, int defender_lost, bool captured)
+  {}
 protected:
 
 };
