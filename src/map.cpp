@@ -96,6 +96,32 @@ std::map<std::string, Territory*> Map::getTerritories() const {
   return territories;
 }
 
+/* Does a breadth-first-search to determine if there is a path of territories 
+   owned by the player who controls src and dest between src and dest. */
+bool Map::areConnected(const Territory *src, const Territory *dest) const {
+  if (!src->isOccupied() || !dest->isOccupied()) {
+    return false;
+  }
+  
+  std::queue<const Territory*> search;
+  search.push(src);
+  while (!search.empty()) {
+    const Territory *current = search.front();
+    search.pop();
+    if (current == dest) {
+      return true;
+    }
+
+    const std::vector<Territory*>& neighbors = current->getNeighbors();
+    for (auto iter = begin(neighbors); iter != end(neighbors); iter++) {
+      if ((*iter)->getOccupierId() == src->getOccupierId()) {
+	search.push(*iter);
+      }
+    }
+  }
+  return false;
+}
+
 double Map::getUnitAverage() const {
   double total = 0;
   for (auto iter = begin(territories); iter != end(territories); iter++) {

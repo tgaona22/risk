@@ -7,10 +7,10 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   console(12, screen_size),
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
   first_turn(true)
-{  
-  //players.push_back(new HumanAgent(map, console, 0, sf::Color::Red));
-  players.push_back(new RandomAgent(map, 0, sf::Color::Red));
-  players.push_back(new PlanningAgent(map, 1, sf::Color::Blue));
+{ 
+  players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
+  players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
+  //players.push_back(new RandomAgent(map, 0, sf::Color::Red));
 }
 
 Game::~Game() {
@@ -262,13 +262,15 @@ std::tuple<Territory*, Territory*, int> Game::askAgentToFortify(IAgent *agent) {
      that is strictly less than the number of units in the territory being moved from.
      If the agent does not wish to fortify, it should return nullptr for the territories. */
   // TODO: The rules state there should be a path between the two territories. Need to implement this functionality in Map class.
+  // DONE!
   const Territory *to, *from;
   int fortifying_units;
   std::tie(to, from, fortifying_units) = agent->fortify();
   if (to == nullptr) {
     return std::make_tuple(nullptr, nullptr, 0);
   }
-  while (!agent->hasTerritory(to) || !agent->hasTerritory(from) || from->getUnits() <= fortifying_units) {
+  while (!agent->hasTerritory(to) || !agent->hasTerritory(from) || from->getUnits() <= fortifying_units 
+	 || !map.areConnected(to, from)) {
     std::tie(to, from, fortifying_units) = agent->fortify();
     if (to == nullptr) {
       return std::make_tuple(nullptr, nullptr, 0);

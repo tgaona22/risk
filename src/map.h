@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "territory.h"
 #include <vector>
+#include <queue>
 #include <map>
 #include <string>
 
@@ -26,6 +27,8 @@ public:
   Territory* getTerritory(const std::string& name);
   const Territory* getTerritory(const std::string& name) const;
   std::map<std::string, Territory*> getTerritories() const; // Note: this is copying the map...
+
+  bool areConnected(const Territory*, const Territory*) const;
 
   double getUnitAverage() const;
 
