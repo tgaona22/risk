@@ -95,6 +95,14 @@ const Territory* Map::getTerritory(const std::string& name) const {
 std::map<std::string, Territory*> Map::getTerritories() const {
   return territories;
 }
+
+double Map::getUnitAverage() const {
+  double total = 0;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    total = total + iter->second->getUnits();
+  }
+  return total / territories.size();
+}
     
     
   

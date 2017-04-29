@@ -18,7 +18,11 @@ private:
   // For testing purposes...
   RandomAgent randy;
 
+  bool has_attack_plan;
+  const Territory *attack_target;
+  int unit_budget;
   std::queue<std::tuple<const Territory*, int>> reinforcement_plan;
+  //std::vector<std::tuple<const Territory*, int>> attack_plan;
 public:
   PlanningAgent(const Map& map, int id, sf::Color color);
   ~PlanningAgent();
@@ -32,12 +36,23 @@ public:
 
 private:
   void allocateReinforcements(int total_reinforcements);
+  void selectTarget();
   
-  int neighborCount(const Territory *territory);
+  int countFriendlyNeighbors(const Territory *territory);
+  int countWeakEnemyNeighbors(const Territory *territory);
   double evaluateThreat(const Territory *territory);
+  double evaluateAttackValue(const Territory *territory);
 
-  bool compareTerritories(std::tuple<const Territory*, double> first, std::tuple<const Territory*, double> second);
-  std::vector<std::tuple<const Territory*, double>> sortTerritories(std::vector<std::tuple<const Territory*, double>>);
+  std::vector<const Territory*> getTargets();
+
+  std::tuple<double, double> simulateAttack(const Territory *target, int attackers_budget, int N);
+  std::tuple<int, int> resolveBattle(int attacking_units, int defending_units);
+  int rollDie();
+  int getRandomInt(int from, int to);
+  int findMax(int *arr, int size);
+
+  static bool compareTerritories(std::tuple<const Territory*, double> first, std::tuple<const Territory*, double> second);
+  int getRank(const Territory *territory, const std::vector<std::tuple<const Territory*, double>>& values);
 };
 
 #endif

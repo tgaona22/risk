@@ -27,6 +27,8 @@ public:
   const Territory* getTerritory(const std::string& name) const;
   std::map<std::string, Territory*> getTerritories() const; // Note: this is copying the map...
 
+  double getUnitAverage() const;
+
 private:
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
