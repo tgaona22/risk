@@ -11,10 +11,10 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
   first_turn(true)
 { 
-  players.push_back(new PlanningAgent(map, 0, sf::Color::Yellow));
+  players.push_back(new PlanningAgent(map, 0, "Yellow", sf::Color::Yellow));
   //players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
   //players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
-  players.push_back(new PlanningAgent(map, 1, sf::Color::Magenta));
+  players.push_back(new PlanningAgent(map, 1, "Purple", sf::Color::Magenta));
 }
 
 Game::~Game() {
@@ -66,7 +66,7 @@ void Game::claimTerritories() {
     IAgent *player = *iter;
     // Ask the player to choose a territory.
     Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories);
-    console.inform("Player " + std::to_string(player->getId()) + " takes " + territory->getName());
+    console.inform(player->getName() + " takes " + territory->getName());
     // Assign that territory to the player.
     assignTerritoryToAgent(territory, player, 1);
     // Remove the territory from the unoccupied list.
@@ -95,9 +95,9 @@ void Game::takeTurn(IAgent *player) {
     if (to != nullptr) {
       IAgent *defender = players.at(to->getOccupierId());
       int defending_units = askAgentToDefend(defender, to, from, attacking_units);
-      console.inform("Player " + std::to_string(player->getId()) + " attacks " + to->getName() 
+      console.inform(player->getName() + " attacks " + to->getName() 
 		     + " from " + from->getName() + " with " + std::to_string(attacking_units) 
-		     + " units. Player " + std::to_string(defender->getId()) + " defends with "
+		     + " units. " + defender->getName() + " defends with "
 		     + std::to_string(defending_units) + " units.");
       resolveBattle(from, to, attacking_units, defending_units);
     }
@@ -111,7 +111,7 @@ void Game::takeTurn(IAgent *player) {
   if (to != nullptr) {
     from->reinforce(-fortifying_units);
     to->reinforce(fortifying_units);
-    console.inform("Player " + std::to_string(player->getId()) + " moves " + std::to_string(fortifying_units) 
+    console.inform(player->getName() + " moves " + std::to_string(fortifying_units) 
 		   + " units from " + from->getName() + " to " + to->getName() + ".");
   }
 
@@ -136,16 +136,16 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
     // Find the greatest dice roll for each player.
     int attacker_index = findMax(attacker_dice, attacking_units);
     int defender_index = findMax(defender_dice, defending_units);
-    console.inform("Player " + std::to_string(attacker->getOccupierId()) + "'s best dice roll is "
-		   + std::to_string(attacker_dice[attacker_index]) + " and Player " + std::to_string(defender->getOccupierId()) 
+    console.inform(players.at(attacker->getOccupierId())->getName() + "'s best dice roll is "
+		   + std::to_string(attacker_dice[attacker_index]) + " and " + players.at(defender->getOccupierId())->getName()
 		   + "'s best roll is " + std::to_string(defender_dice[defender_index]));
     // The defender wins in case of tie.
     if (attacker_dice[attacker_index] > defender_dice[defender_index]) {
-      console.inform("Player " + std::to_string(attacker->getOccupierId()) + " wins the battle.");
+      console.inform(players.at(attacker->getOccupierId())->getName() + " wins the battle.");
       defender_loss += 1;
     }
     else { 
-      console.inform("Player " + std::to_string(defender->getOccupierId()) + " wins the battle.");
+      console.inform(players.at(defender->getOccupierId())->getName() + " wins the battle.");
       attacker_loss += 1;
     }
     // Discard the two highest dice for the next comparison.
@@ -163,8 +163,8 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
 
   // If the defender lost all their units, the attacker captures the territory.
   if (defender->getUnits() == 0) {
-    console.inform("Player " + std::to_string(attacker->getOccupierId()) + " captures " + defender->getName() 
-		   + " from Player " + std::to_string(defender->getOccupierId()) + "!");
+    console.inform(players.at(attacker->getOccupierId())->getName() + " captures " + defender->getName() 
+		   + " from " + players.at(defender->getOccupierId())->getName() + "!");
     IAgent *attacking_agent = players.at(attacker->getOccupierId());
     int capturing_units = askAgentToCapture(attacking_agent, attacker, defender, attacking_units - attacker_loss);
     assignTerritoryToAgent(defender, attacking_agent, capturing_units);
@@ -187,7 +187,7 @@ void Game::assignReinforcements(IAgent *player) {
     std::tie(territory, reinforcements) = askAgentToReinforce(player, total_reinforcements);
     territory->reinforce(reinforcements);
     total_reinforcements = total_reinforcements - reinforcements;
-    console.inform("Player " + std::to_string(player->getId()) + " reinforces " + territory->getName() 
+    console.inform(player->getName() + " reinforces " + territory->getName() 
 		   + " with " + std::to_string(reinforcements) + " units.");
   }  
 }

@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-RandomAgent::RandomAgent(const Map& map, int id, sf::Color color) :
-  IAgent(map, id, color)
+RandomAgent::RandomAgent(const Map& map, int id, std::string name, sf::Color color) :
+  IAgent(map, id, name, color)
 {
   // Seed the random number generator.
   std::srand((unsigned)std::time(0));

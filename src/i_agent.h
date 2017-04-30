@@ -5,6 +5,7 @@
 #include "territory.h"
 
 #include <tuple>
+#include <string>
 
 class Map;
 class Territory;
@@ -14,12 +15,14 @@ protected:
   const Map& map;
   std::vector<const Territory*> territories;
   int id;
+  std::string name;
   sf::Color color;
 public:
-  IAgent(const Map& map, int id, sf::Color color) : map(map), id(id), color(color) {}
+  IAgent(const Map& map, int id, std::string name, sf::Color color) : map(map), id(id), name(name), color(color) {}
   virtual ~IAgent() {}
 
   int getId() const;
+  const std::string& getName() const;
   int getNumberOfTerritories() const;
   bool hasTerritory(const Territory *territory) const;
   bool canAttack(const Territory *territory) const;

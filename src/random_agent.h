@@ -6,6 +6,7 @@
 #include "territory.h"
 
 #include <tuple>
+#include <string>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -13,7 +14,7 @@
 class RandomAgent : public IAgent {
 private:
 public:
-  RandomAgent(const Map& map, int id, sf::Color color);
+  RandomAgent(const Map& map, int id, std::string name, sf::Color color);
   ~RandomAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories);

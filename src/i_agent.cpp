@@ -4,6 +4,10 @@ int IAgent::getId() const {
   return id;
 }
 
+const std::string& IAgent::getName() const {
+  return name;
+}
+
 int IAgent::getNumberOfTerritories() const {
   return territories.size();
 }

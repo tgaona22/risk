@@ -5,8 +5,8 @@
 // Testing purposes...
 #include <iostream>
 
-PlanningAgent::PlanningAgent(const Map& map, int id, sf::Color color) :
-  IAgent(map, id, color), randy(map, id, color), unit_budget(0), has_attack_plan(false)
+PlanningAgent::PlanningAgent(const Map& map, int id, std::string name, sf::Color color) :
+  IAgent(map, id, name, color), unit_budget(0), has_attack_plan(false)
 {}
 
 PlanningAgent::~PlanningAgent() {}

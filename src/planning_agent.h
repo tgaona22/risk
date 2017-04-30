@@ -15,16 +15,12 @@
 
 class PlanningAgent : public IAgent {
 private:
-  // For testing purposes...
-  RandomAgent randy;
-
   bool has_attack_plan;
   const Territory *attack_target;
   int unit_budget;
   std::queue<std::tuple<const Territory*, int>> reinforcement_plan;
-  //std::vector<std::tuple<const Territory*, int>> attack_plan;
 public:
-  PlanningAgent(const Map& map, int id, sf::Color color);
+  PlanningAgent(const Map& map, int id, std::string name, sf::Color color);
   ~PlanningAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories);

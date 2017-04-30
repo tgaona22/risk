@@ -2,6 +2,7 @@
 #define HUMAN_AGENT_H
 
 #include <map>
+#include <string>
 
 #include "i_agent.h"
 #include "territory.h"
@@ -12,7 +13,7 @@ class HumanAgent : public IAgent {
 private:
   Console& console;
 public:
-  HumanAgent(const Map& map, Console& console, int id, sf::Color color);
+  HumanAgent(const Map& map, Console& console, int id, std::string name, sf::Color color);
   ~HumanAgent();
 
   const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories);

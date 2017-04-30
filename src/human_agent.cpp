@@ -1,7 +1,7 @@
 #include "human_agent.h"
 
-HumanAgent::HumanAgent(const Map& map, Console& console, int id, sf::Color color) :
-  IAgent(map, id, color),
+HumanAgent::HumanAgent(const Map& map, Console& console, int id, std::string name, sf::Color color) :
+  IAgent(map, id, name, color),
   console(console)
 {}
 
