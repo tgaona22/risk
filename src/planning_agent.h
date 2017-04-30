@@ -42,6 +42,7 @@ private:
   
   int countFriendlyNeighbors(const Territory *territory);
   int countWeakEnemyNeighbors(const Territory *territory);
+  double calculateAverageThreat();
   double evaluateThreat(const Territory *territory);
   double evaluateAttackValue(const Territory *territory);
 

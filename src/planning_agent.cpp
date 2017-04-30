@@ -60,6 +60,11 @@ std::tuple<const Territory*, const Territory*, int> PlanningAgent::attack() {
       }
     }
   }
+
+  // It may be that no one is eligible to attack the target by this point.
+  if (!attacker) {
+    return std::make_tuple(nullptr, nullptr, 0);
+  }
   
   int attacking_units = std::min(unit_budget, std::min(3, attacker->getUnits() - 1));
   // In the informOfBattleOutcome method we update the unit budget with the number of lost troops.  
@@ -73,11 +78,72 @@ int PlanningAgent::defend(const Territory *attacker, const Territory *defender, 
 }
 
 int PlanningAgent::capture(const Territory *from, const Territory *to_capture, int attacking_units) {
-  return randy.capture(from, to_capture, attacking_units);
+  /* Caution! evaluateThreat(to_capture) won't behave like you want it to since at this point
+     the territory still belongs to the enemy. */
+  // If there is no threat to 'from', move as many units as possible.
+  double src_threat = evaluateThreat(from);
+
+  // Count the number of enemy units adjacent to the captured territory.
+  int adjacent_enemies = 0;
+  const std::vector<Territory*>& neighbors = to_capture->getNeighbors();
+  for (auto iter = begin(neighbors); iter != end(neighbors); iter++) {
+    if (!hasTerritory(*iter)) {
+      adjacent_enemies = adjacent_enemies + (*iter)->getUnits();
+    }
+  }
+  
+  // Intelligently assign units based on the number of adjacent enemy units and src_threat...
+  int units_to_move = attacking_units;
+  double dest_threat = adjacent_enemies / units_to_move;
+  while (dest_threat > src_threat && units_to_move < from->getUnits() - 1) {
+    units_to_move = units_to_move + 1;
+    dest_threat = adjacent_enemies / units_to_move;
+  }
+
+  //std::cout << "trying to capture with
+	 
+  return units_to_move;
 }
 
 std::tuple<const Territory*, const Territory*, int> PlanningAgent::fortify() {
-  return randy.fortify();
+  // Determine which territory is most threatened.
+  const Territory *most_threatened;
+  double greatest_threat = INT_MIN;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    double threat = evaluateThreat(*iter);
+    if (threat > greatest_threat) {
+      most_threatened = *iter;
+      greatest_threat = threat;
+    }
+  }
+
+  // Get a list of territories that we can move units from.
+  std::vector<const Territory*> eligible_fortifiers;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    if (*iter != most_threatened && (*iter)->getUnits() > 1) {
+      eligible_fortifiers.push_back(*iter);
+    }
+  }
+
+  // As a first approximation, let's just move units from the least threatened eligible territory.
+  const Territory *least_threatened;
+  double least_threat = INT_MAX;
+  for (auto iter = begin(eligible_fortifiers); iter != end(eligible_fortifiers); iter++) {
+    double threat = evaluateThreat(*iter);
+    if (threat < least_threat) {
+      least_threatened = *iter;
+      least_threat = threat;
+    }
+  }
+  
+  if (least_threat < .01) {
+    return std::make_tuple(most_threatened, least_threatened, least_threatened->getUnits() - 1);
+  }
+  double ratio = greatest_threat / least_threat;
+  int units_to_move = std::min(static_cast<int>(floor(ratio)), least_threatened->getUnits() - 1);
+  std::cout << "Planner is trying to fortify " << most_threatened->getName() << " from " << least_threatened->getName() 
+	    << " with " << units_to_move << " units.\n";
+  return std::make_tuple(most_threatened, least_threatened, units_to_move);
 }
 
 void PlanningAgent::informOfBattleOutcome(int attacker_id, int defender_id, int attacker_lost, int defender_lost, bool captured) {
@@ -251,6 +317,14 @@ int PlanningAgent::countWeakEnemyNeighbors(const Territory *territory) {
     }
   }
   return count;
+}
+
+double PlanningAgent::calculateAverageThreat() {
+  double total_threat = 0;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    total_threat = total_threat + evaluateThreat(*iter);
+  }
+  return total_threat / territories.size();
 }
 
 double PlanningAgent::evaluateThreat(const Territory *territory) {
