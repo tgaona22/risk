@@ -35,9 +35,13 @@ bool Game::run() {
   auto iter = begin(players);
   while (!isOver()) {
     // Player can only take their turn if they haven't lost - ie they still control territories.
+    // If the player doesn't have any more territories, remove them from the game.
     IAgent *player = *iter;
     if (player->getNumberOfTerritories() > 0) {
       takeTurn(*iter);
+    }
+    else {
+      players.erase(std::find(begin(players), end(players), player));
     }
     // Move on to the next player.
     iter++;

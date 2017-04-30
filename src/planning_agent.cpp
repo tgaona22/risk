@@ -43,6 +43,9 @@ std::tuple<const Territory*, const Territory*, int> PlanningAgent::attack() {
   }
 
   if (!attack_target || !has_attack_plan || hasTerritory(attack_target)) {
+    if (getTargets().empty()) {
+      return std::make_tuple(nullptr, nullptr, 0);
+    }
     has_attack_plan = true;
     selectTarget();
   }
@@ -123,6 +126,10 @@ std::tuple<const Territory*, const Territory*, int> PlanningAgent::fortify() {
     if (*iter != most_threatened && (*iter)->getUnits() > 1) {
       eligible_fortifiers.push_back(*iter);
     }
+  }
+  // If no one can fortify, we have to pass.
+  if (eligible_fortifiers.empty()) {
+    return std::make_tuple(nullptr, nullptr, 0);
   }
 
   // As a first approximation, let's just move units from the least threatened eligible territory.
