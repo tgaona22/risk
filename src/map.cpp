@@ -104,6 +104,7 @@ bool Map::areConnected(const Territory *src, const Territory *dest) const {
   }
   
   std::queue<const Territory*> search;
+  std::vector<const Territory*> searched;
   search.push(src);
   while (!search.empty()) {
     const Territory *current = search.front();
@@ -114,10 +115,11 @@ bool Map::areConnected(const Territory *src, const Territory *dest) const {
 
     const std::vector<Territory*>& neighbors = current->getNeighbors();
     for (auto iter = begin(neighbors); iter != end(neighbors); iter++) {
-      if ((*iter)->getOccupierId() == src->getOccupierId()) {
+      if ((*iter)->getOccupierId() == src->getOccupierId() && std::find(begin(searched), end(searched), *iter) == end(searched)) {
 	search.push(*iter);
       }
     }
+    searched.push_back(current);
   }
   return false;
 }
