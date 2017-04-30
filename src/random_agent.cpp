@@ -71,7 +71,19 @@ std::tuple<const Territory*, const Territory*, int> RandomAgent::fortify() {
 
   const Territory *to, *from; 
   from = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
-  to = possible_fortifiers.at(getRandomInt(0, possible_fortifiers.size() - 1));
+
+  std::vector<const Territory*> possible_destinations;
+  for (auto iter = begin(territories); iter != end(territories); iter++) {
+    if (*iter != from && map.areConnected(*iter, from)) {
+      possible_destinations.push_back(*iter);
+    }
+  }
+  
+  if (possible_destinations.size() == 0) {
+    return std::make_tuple(nullptr, nullptr, 0);
+  }
+  
+  to = possible_destinations.at(getRandomInt(0, possible_destinations.size() - 1));
   int fortifying_units = getRandomInt(1, from->getUnits() - 1);
   return std::make_tuple(to, from, fortifying_units);
 }
