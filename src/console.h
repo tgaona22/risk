@@ -3,12 +3,17 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <deque>
 #include <string>
 
 class Console : public sf::Drawable {
 private:
-  std::vector<sf::Text*> log;
-  int log_offset, log_length, log_position;
+  //std::vector<sf::Text*> log;
+  std::deque<sf::Text*> log;
+  std::deque<sf::Text*>::iterator log_offset;
+  //std::queue<std::string> commands;
+  int log_length, log_position;
+  int log_max;
   sf::Text cmdline;
   std::string cmdstring;
   int max_cmd_length, cmd_position;

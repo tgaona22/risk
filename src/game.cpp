@@ -11,9 +11,10 @@ Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
   first_turn(true)
 { 
-  players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
+  players.push_back(new PlanningAgent(map, 0, sf::Color::Yellow));
+  //players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
   //players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
-  players.push_back(new RandomAgent(map, 1, sf::Color::Magenta));
+  players.push_back(new PlanningAgent(map, 1, sf::Color::Magenta));
 }
 
 Game::~Game() {
@@ -225,8 +226,6 @@ Territory* Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::st
 }
 
 std::tuple<Territory*, Territory*, int> Game::askAgentToAttack(IAgent *agent) {
-  std::cout << "Asking " << agent->getId() << " to attack.\n";
-  
   const Territory *to, *from;
   int attacking_units;
   std::tie(to, from, attacking_units) = agent->attack();

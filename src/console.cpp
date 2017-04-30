@@ -1,5 +1,7 @@
 #include "console.h"
 
+#include <iostream>
+
 Console::Console(int log_length, const sf::Vector2<int>& window_size) {
   font_size = 16;
   font.loadFromFile("/usr/share/fonts/truetype/DroidSans.ttf");
@@ -33,14 +35,14 @@ void Console::initCmdLine(const sf::Vector2<int>& window_size) {
 // Initializes the message log.
 void Console::initLog(int length, const sf::Vector2<int>& window_size) {
   log_length = length;
+  log_max = 50;
   log_position = window_size.y - 2*font_size;
-  log_offset = 0;
+  log_offset = begin(log);
 }
 
 // Frees the memory allocated by log messages.
 Console::~Console() {
-  std::vector<sf::Text*>::iterator iter;
-  for (iter = log.begin(); iter != log.end(); iter++) {
+  for (auto iter = begin(log); iter != end(log); iter++) {
     delete *iter;
   }
 }
@@ -53,8 +55,8 @@ std::string Console::prompt(const std::string& msg) {
   while(!command_entered) { }
   listen_to_input = false;
   // Return the most recently entered command.
-  std::string latest_command = log.at(log.size() - 1)->getString();
-  return latest_command;
+  //std::string latest_command = log.at(log.size() - 1)->getString();
+  return log.front()->getString();
 }
 
 void Console::inform(const std::string& msg) {
@@ -62,10 +64,19 @@ void Console::inform(const std::string& msg) {
 }
 
 void Console::addToLog(const std::string& msg, sf::Color color = sf::Color::Green) {
-  log_offset = 0;
+  log_offset = begin(log);
   sf::Text *msg_text = new sf::Text(msg, font, font_size);
   msg_text->setColor(color);
-  log.push_back(msg_text);
+  log.push_front(msg_text);
+  
+  // Delete old messages once the log reaches a certain length.
+  if (log.size() > log_max) {
+    sf::Text *to_delete = log.back();
+    delete to_delete;
+    log.pop_back();
+  }
+
+  //log.push_back(msg_text);
   updateLogPositions();
 }
 
@@ -104,14 +115,13 @@ bool Console::enterCommand() {
  * messages in the log if *up* is false. */
 void Console::scroll(bool up) {
   if (up) {
-    // log.size() must be cast to int because it returns an unsigned type.
-    if (log_offset < (int)log.size() - log_length) {
-      log_offset++;
+    if (log_offset + log_length < end(log)) {
+      log_offset = log_offset + 1;
     }
   }
   else {
-    if (log_offset > 0) {
-      log_offset--;
+    if (log_offset != begin(log)) {
+      log_offset = log_offset - 1;
     }
   }
   updateLogPositions();
@@ -122,23 +132,26 @@ void Console::scroll(bool up) {
 void Console::draw(sf::RenderTarget& target, sf::RenderStates states) const {
   // Display the command line.
   target.draw(cmdline);
-  /* Display *log_length* number of messages, starting with the message 
-   * that is *log_offset* number of messages from the end of the list. */
-  std::vector<sf::Text*>::const_iterator iter = (log.end()-1) - log_offset;
-  for (int i = 0; i < log_length && i < log.size(); i++) {
+  // Display log_length number of messages starting from log_offset.
+  std::deque<sf::Text*>::const_iterator iter = log_offset;
+  int i = 0;
+  while (i < log_length && iter != end(log)) {
     sf::Text *msg = *iter;
     target.draw(*msg);
-    iter--;
+    iter = iter + 1;
+    i = i + 1;
   }
 }
 
 /* Sets the positions of the *log_length* number of messages that are
  * to be drawn to the screen. */
 void Console::updateLogPositions() {
-  std::vector<sf::Text*>::iterator iter = (log.end()-1) - log_offset;
-  for (int i = 0; i < log_length && i < log.size(); i++) {
+  std::deque<sf::Text*>::iterator iter = log_offset;
+  int i = 0;
+  while (i < log_length && iter != end(log)) {
     (*iter)->setPosition(0, log_position - i*font_size);
-    iter--;
+    iter = iter + 1;
+    i = i + 1;
   }
 }
 
