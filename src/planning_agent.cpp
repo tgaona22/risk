@@ -123,7 +123,7 @@ std::tuple<const Territory*, const Territory*, int> PlanningAgent::fortify() {
   // Get a list of territories that we can move units from.
   std::vector<const Territory*> eligible_fortifiers;
   for (auto iter = begin(territories); iter != end(territories); iter++) {
-    if (*iter != most_threatened && (*iter)->getUnits() > 1) {
+    if (*iter != most_threatened && map.areConnected(most_threatened, *iter) && (*iter)->getUnits() > 1) {
       eligible_fortifiers.push_back(*iter);
     }
   }
