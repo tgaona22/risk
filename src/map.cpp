@@ -61,9 +61,21 @@ void Map::initNeighbors(const std::string& mapfile) {
       Territory *neighbor_territory = getTerritory(neighbor);
       current_territory->addNeighbor(neighbor_territory);
 
-      // Add a line connecting the two territories.
-      connecting_lines.push_back(sf::Vertex(current_territory->getPosition(), sf::Color(105,105,105)));
-      connecting_lines.push_back(sf::Vertex(neighbor_territory->getPosition(), sf::Color(105,105,105)));
+      // Special case for the Kamchatka Alaska connection...
+      //std::cout << current_territory->getName();
+      if (current_territory->getName().compare("Alaska") == 0 && neighbor_territory->getName().compare("Kamchatka") == 0) {
+	connecting_lines.push_back(sf::Vertex(current_territory->getPosition(), sf::Color(105,105,105)));
+	connecting_lines.push_back(sf::Vertex(sf::Vector2f(0, 100), sf::Color(105,105,105)));
+      }
+      else if (current_territory->getName().compare("Kamchatka") == 0 && neighbor_territory->getName().compare("Alaska") == 0) {
+	connecting_lines.push_back(sf::Vertex(current_territory->getPosition(), sf::Color(105,105,105)));
+	connecting_lines.push_back(sf::Vertex(sf::Vector2f(size.x, 110), sf::Color(105,105,105)));
+      }
+      else {
+	// Add a line connecting the two territories.
+	connecting_lines.push_back(sf::Vertex(current_territory->getPosition(), sf::Color(105,105,105)));
+	connecting_lines.push_back(sf::Vertex(neighbor_territory->getPosition(), sf::Color(105,105,105)));
+      }
     }
   }
   // Close the input stream.

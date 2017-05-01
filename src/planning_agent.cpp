@@ -202,7 +202,7 @@ void PlanningAgent::selectTarget() {
       best_rank = rank;
     }
   }
-  std::cout << "The target is " << attack_target->getName() << std::endl;
+  std::cout << "THE TARGET IS " << attack_target->getName() << std::endl;
 }
 
 void PlanningAgent::allocateReinforcements(int total_reinforcements) {
@@ -240,6 +240,7 @@ void PlanningAgent::allocateReinforcements(int total_reinforcements) {
     }
     *iter = (*iter) + 1;
     allocated = allocated + 1;
+    iter = iter + 1;
   }
   // Add the territory, reinforcement pairs to the queue.
   for (int i = 0; i < rated_territories.size(); i++) {
@@ -289,11 +290,14 @@ std::tuple<double, double> PlanningAgent::simulateAttack(const Territory *target
 std::vector<const Territory*> PlanningAgent::getTargets() {
   std::vector<const Territory*> targets;
   for (auto iter_t = begin(territories); iter_t != end(territories); iter_t++) {
-    const std::vector<Territory*>& neighbors = (*iter_t)->getNeighbors();
-    for (auto iter_n = begin(neighbors); iter_n != end(neighbors); iter_n++) {
-      // Only add the neighbor if the agent does not control it and it isn't already in the list.
-      if (!hasTerritory(*iter_n) && std::find(begin(targets), end(targets), *iter_n) == end(targets)) {
-	targets.push_back(*iter_n);
+    // Only consider neighbors of territories we can actually attack from.
+    if ((*iter_t)->getUnits() > 1) {
+      const std::vector<Territory*>& neighbors = (*iter_t)->getNeighbors();
+      for (auto iter_n = begin(neighbors); iter_n != end(neighbors); iter_n++) {
+	// Only add the neighbor if the agent does not control it and it isn't already in the list.
+	if (!hasTerritory(*iter_n) && std::find(begin(targets), end(targets), *iter_n) == end(targets)) {
+	  targets.push_back(*iter_n);
+	}
       }
     }
   }

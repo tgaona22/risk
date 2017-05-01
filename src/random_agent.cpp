@@ -6,14 +6,19 @@ RandomAgent::RandomAgent(const Map& map, int id, std::string name, sf::Color col
   IAgent(map, id, name, color)
 {
   // Seed the random number generator.
-  std::srand((unsigned)std::time(0));
+  //std::srand((unsigned)std::time(0));
 }
 
 RandomAgent::~RandomAgent() {}
 
 const Territory* RandomAgent::selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories) {
-  auto iter = begin(unoccupied_territories);
-  return (*iter).second;
+  std::vector<const Territory*> unoccupied;
+  for (auto iter = begin(unoccupied_territories); iter != end(unoccupied_territories); iter++) {
+    unoccupied.push_back((*iter).second);
+  }
+  auto iter = begin(unoccupied);
+  int random = getRandomInt(0, unoccupied_territories.size() - 1);
+  return *(iter+random);
 }
 
 std::tuple<const Territory*, int> RandomAgent::reinforce(int total_reinforcements) {

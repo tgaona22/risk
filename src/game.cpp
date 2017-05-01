@@ -3,18 +3,23 @@
 // Testing...
 #include <iostream>
 
-//const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
-const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
+#include <cstdlib>
+#include <ctime>
+
+
+const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
+//const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string& map_file) :
   console(5, screen_size),
-  map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.y - console.getSize().y, screen_size.x)),
+  map(map_file, sf::Vector2<int>(0,0), sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
   first_turn(true)
 { 
-  players.push_back(new PlanningAgent(map, 0, "Yellow", sf::Color::Yellow));
-  //players.push_back(new PlanningAgent(map, 0, sf::Color::Blue));
+  std::srand((unsigned)std::time(0));
+  players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
   //players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
-  players.push_back(new PlanningAgent(map, 1, "Purple", sf::Color::Magenta));
+  players.push_back(new RandomAgent(map, 1, "Purple", sf::Color::Magenta));
+  //players.push_back(new RandomAgent(map, 2, "Blue", sf::Color::Blue));
 }
 
 Game::~Game() {
@@ -100,6 +105,7 @@ void Game::takeTurn(IAgent *player) {
 		     + " units. " + defender->getName() + " defends with "
 		     + std::to_string(defending_units) + " units.");
       resolveBattle(from, to, attacking_units, defending_units);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
     }
   } while (to != nullptr); 
 
