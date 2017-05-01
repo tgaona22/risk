@@ -1,0 +1,42 @@
+Iceland 300 100 GreatBritain Scandinavia Greenland
+GreatBritain 300 160 Iceland Scandinavia NorthernEurope WesternEurope
+Scandinavia 370 100 Iceland GreatBritain NorthernEurope Ukraine
+Ukraine 430 140 Scandinavia NorthernEurope SouthernEurope MiddleEast Afghanistan Ural
+NorthernEurope 360 160 GreatBritain Scandinavia WesternEurope SouthernEurope Ukraine 
+WesternEurope 290 220 GreatBritain NorthernEurope SouthernEurope NorthAfrica
+SouthernEurope 350 240 WesternEurope NorthernEurope Ukraine NorthAfrica MiddleEast Egypt
+Greenland 260 60 Iceland NorthwestTerritory Ontario Quebec
+Quebec 240 130 Greenland Ontario EasternUS
+Ontario 200 130 Quebec Greenland NorthwestTerritory Alberta WesternUS EasternUS
+NorthwestTerritory 180 80 Greenland Alaska Alberta Ontario 
+Alberta 160 130 Alaska NorthwestTerritory Ontario WesternUS
+Alaska 120 100 NorthwestTerritory Alberta Kamchatka
+WesternUS 160 180 Alberta Ontario EasternUS CentralAmerica
+EasternUS 220 190 WesternUS Ontario Quebec CentralAmerica
+CentralAmerica 180 230 WesternUS EasternUS Venezuela
+Venezuela 220 280 CentralAmerica Brazil Peru
+Peru 200 330 Venezuela Brazil Argentina
+Argentina 230 390 Peru Brazil
+Brazil 260 320 Venezuela Peru Argentina NorthAfrica
+NorthAfrica 310 300 Brazil WesternEurope SouthernEurope EastAfrica Egypt Congo
+Egypt 380 290 NorthAfrica SouthernEurope EastAfrica MiddleEast
+EastAfrica 390 350 Egypt NorthAfrica Congo SouthAfrica Madagascar
+Congo 340 360 NorthAfrica EastAfrica SouthAfrica
+SouthAfrica 370 430 Congo EastAfrica Madagascar
+Madagascar 410 400 SouthAfrica EastAfrica
+MiddleEast 420 270 SouthernEurope Ukraine Egypt India Afghanistan
+Afghanistan 460 210 MiddleEast Ukraine Ural China India
+Ural 490 160 Ukraine Afghanistan Siberia China
+Siberia 530 120 Ural Yakutsk Irkutsk Mongolia China
+Yakutsk 570 100 Siberia Kamchatka Irkutsk
+Irkutsk 570 160 Siberia Yakutsk Kamchatka Mongolia
+Kamchatka 620 110 Yakutsk Irkutsk Mongolia Japan Alaska
+Mongolia 580 210 Irkutsk Siberia Kamchatka Japan China
+Japan 640 200 Mongolia Kamchatka
+China 560 260 Afghanistan Ural Siberia Mongolia India Siam
+India 500 260 MiddleEast Afghanistan China Siam
+Siam 570 310 India China Indonesia
+Indonesia 570 360 Siam NewGuinea WesternAustralia
+NewGuinea 610 340 Indonesia WesternAustralia EasternAustralia
+WesternAustralia 560 420 Indonesia NewGuinea EasternAustralia
+EasternAustralia 620 400 WesternAustralia NewGuinea
