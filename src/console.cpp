@@ -41,7 +41,7 @@ void Console::initLog(int length, const sf::Vector2<int> &window_size)
   log_length = length;
   log_max = 8;
   log_position = window_size.y - 2 * font_size;
-  log_offset = begin(log);
+  log_offset = 0;
 }
 
 // Frees the memory allocated by log messages.
@@ -75,7 +75,6 @@ void Console::inform(const std::string &msg)
 
 void Console::addToLog(const std::string &msg, sf::Color color = sf::Color::Green)
 {
-  // log_offset = begin(log);
   sf::Text *msg_text = new sf::Text(msg, font, font_size);
   msg_text->setColor(color);
   log.push_front(msg_text);
@@ -88,8 +87,7 @@ void Console::addToLog(const std::string &msg, sf::Color color = sf::Color::Gree
     log.pop_back();
   }
 
-  log_offset = begin(log);
-  // log.push_back(msg_text);
+  log_offset = 0;
   updateLogPositions();
 }
 
@@ -136,14 +134,14 @@ void Console::scroll(bool up)
 {
   if (up)
   {
-    if (log_offset + log_length < end(log))
+    if (log_offset + log_length < log.size())
     {
       log_offset = log_offset + 1;
     }
   }
   else
   {
-    if (log_offset != begin(log))
+    if (log_offset > 0)
     {
       log_offset = log_offset - 1;
     }
@@ -158,13 +156,13 @@ void Console::draw(sf::RenderTarget &target, sf::RenderStates states) const
   // Display the command line.
   target.draw(cmdline);
   // Display log_length number of messages starting from log_offset.
-  std::deque<sf::Text *>::const_iterator iter = log_offset;
+  int log_index = log_offset;
   int i = 0;
-  while (i < log_length && iter != end(log))
+  while (i < log_length && log_index < log.size())
   {
-    sf::Text *msg = *iter;
+    sf::Text *msg = log.at(log_index);
     target.draw(*msg);
-    iter = iter + 1;
+    log_index = log_index + 1;
     i = i + 1;
   }
 }
@@ -173,12 +171,10 @@ void Console::draw(sf::RenderTarget &target, sf::RenderStates states) const
  * to be drawn to the screen. */
 void Console::updateLogPositions()
 {
-  std::deque<sf::Text *>::iterator iter = log_offset;
   int i = 0;
-  while (i < log_length && iter != end(log))
+  while (i < log_length && log_offset + i < log.size())
   {
-    (*iter)->setPosition(0, log_position - i * font_size);
-    iter = iter + 1;
+    log.at(log_offset + i)->setPosition(0, log_position - i * font_size);
     i = i + 1;
   }
 }
