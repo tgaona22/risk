@@ -87,7 +87,7 @@ void Console::addToLog(const std::string &msg, sf::Color color = sf::Color::Gree
     log.pop_back();
   }
 
-  log_offset = 0;
+  // log_offset = 0;
   updateLogPositions();
 }
 

@@ -17,7 +17,8 @@ Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
   // players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
   players.push_back(new RandomAgent(map, 1, "Purple", sf::Color::Magenta));
-  // players.push_back(new RandomAgent(map, 2, "Blue", sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 2, "Blue", sf::Color::Blue));
+  players.push_back(new RandomAgent(map, 3, "Green", sf::Color::Green));
 }
 
 Game::~Game()
@@ -90,7 +91,7 @@ void Game::claimTerritories()
     // Remove the territory from the unoccupied list.
     unoccupied_territories.erase(territory->getName());
     // Move on to the next player.
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
     iter++;
     if (iter == end(players))
     {
