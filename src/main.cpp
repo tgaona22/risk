@@ -17,7 +17,7 @@ int main()
 
   std::string root_dir = "C:\\Users\\TylerGaona\\Documents\\Projects\\tag2\\risk\\";
 
-  Game game(window_size, root_dir + "testboard2.txt");
+  Game game(window_size, root_dir + "data/territories.json");
   // It is necessary to run the game on a separate thread so the UI doesn't block.
   std::thread game_thread(startGame, &game);
   game_thread.detach();
