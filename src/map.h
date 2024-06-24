@@ -37,10 +37,6 @@ public:
 
 private:
   virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-
-  // Functions related to map initialization.
-  void initTerritories(const std::string &mapfile);
-  void initNeighbors(const std::string &mapfile);
 };
 
 #endif
