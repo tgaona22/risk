@@ -80,7 +80,6 @@ void Map::draw(sf::RenderTarget &target, sf::RenderStates states) const
   }
 }
 
-// what the fuck?
 Territory *Map::getTerritory(const std::string &name)
 {
   return const_cast<Territory *>(static_cast<const Map &>(*this).getTerritory(name));

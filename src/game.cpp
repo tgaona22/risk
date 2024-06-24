@@ -6,8 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 
-const int Game::initial_army_size[] = {0, 0, 40, 35, 30, 25, 20};
-// const int Game::initial_army_size[] = {0, 0, 10, 10, 10, 10};
+const int Game::initial_army_size[] = {0, 0, 50, 35, 30, 25, 20};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(5, screen_size),
                                                                         map(map_file, sf::Vector2<int>(0, 0), sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
