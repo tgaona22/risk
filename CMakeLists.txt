@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name
 project(RiskGame)
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 set(CMAKE_BUILD_TYPE Debug)
 
 # Specify the C++ standard
