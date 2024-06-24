@@ -21,7 +21,8 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
     for (auto &t : cont["territories"])
     {
       Territory *territory = new Territory(t["name"], cont, t["x"], t["y"]);
-      territories.emplace(t["name"], territory);
+      named_territories.emplace(t["name"], territory);
+      territories.push_back(territory);
     }
   }
 
@@ -32,8 +33,8 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
     {
       for (auto &n_name : t_json["neighbors"])
       {
-        Territory *t = getTerritory(t_json["name"]);
-        Territory *n = getTerritory(n_name);
+        Territory *t = named_territories.at(t_json["name"]);
+        Territory *n = named_territories.at(n_name);
         t->addNeighbor(n);
 
         // Draw the lines between territories. Alaska/Kamchatka is a special case.
@@ -62,7 +63,7 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
 
 Map::~Map()
 {
-  for (auto iter = begin(territories); iter != end(territories); iter++)
+  for (auto iter = begin(named_territories); iter != end(named_territories); iter++)
   {
     delete iter->second;
   }
@@ -73,31 +74,31 @@ void Map::draw(sf::RenderTarget &target, sf::RenderStates states) const
   // Draw the lines connecting the neighboring territories.
   target.draw(&connecting_lines[0], connecting_lines.size(), sf::Lines);
   // Draw each territory.
-  for (auto iter = begin(territories); iter != end(territories); iter++)
+  for (auto iter = begin(named_territories); iter != end(named_territories); iter++)
   {
     Territory *territory = iter->second;
     target.draw(*territory);
   }
 }
 
-Territory *Map::getTerritory(const std::string &name)
-{
-  return const_cast<Territory *>(static_cast<const Map &>(*this).getTerritory(name));
-}
-
 const Territory *Map::getTerritory(const std::string &name) const
 {
-  auto iter = territories.find(name);
-  if (iter == end(territories))
+  auto iter = named_territories.find(name);
+  if (iter == end(named_territories))
   {
     return nullptr;
   }
   return iter->second;
 }
 
-std::map<std::string, Territory *> Map::getTerritories() const
+const std::vector<Territory *> Map::getTerritories() const
 {
   return territories;
+}
+
+const std::map<std::string, Territory *> Map::getNamedTerritories() const
+{
+  return named_territories;
 }
 
 /* Does a breadth-first-search to determine if there is a path of territories
@@ -137,9 +138,9 @@ bool Map::areConnected(const Territory *src, const Territory *dest) const
 double Map::getUnitAverage() const
 {
   double total = 0;
-  for (auto iter = begin(territories); iter != end(territories); iter++)
+  for (auto iter = begin(named_territories); iter != end(named_territories); iter++)
   {
     total = total + iter->second->getUnits();
   }
-  return total / territories.size();
+  return total / named_territories.size();
 }
