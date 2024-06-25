@@ -11,21 +11,22 @@
 #include <cstdlib>
 #include <ctime>
 
-class RandomAgent : public IAgent {
+class RandomAgent : public IAgent
+{
 private:
 public:
-  RandomAgent(const Map& map, int id, std::string name, sf::Color color);
+  RandomAgent(const Map &map, int id, std::string name, sf::Color color);
   ~RandomAgent();
 
-  const Territory* selectUnoccupiedTerritory(const std::map<std::string, Territory*>& unoccupied_territories);
-  std::tuple<const Territory*, int> reinforce(int total_reinforcements);
-  std::tuple<const Territory*, const Territory*, int> attack();
+  const Territory *chooseTerritory(const std::vector<Territory *> &valid_territories, bool choose_unoccupied);
+  std::tuple<const Territory *, int> reinforce(int total_reinforcements);
+  std::tuple<const Territory *, const Territory *, int> attack();
   int defend(const Territory *attacker, const Territory *defender, int attacking_units);
   int capture(const Territory *from, const Territory *to_capture, int attacking_units);
-  std::tuple<const Territory*, const Territory*, int> fortify();
+  std::tuple<const Territory *, const Territory *, int> fortify();
 
 private:
-  const Territory* getRandomTerritory() const;
+  const Territory *getRandomTerritory() const;
   int getRandomInt(int from, int to) const;
 };
 

@@ -11,22 +11,32 @@ PlanningAgent::PlanningAgent(const Map &map, int id, std::string name, sf::Color
 
 PlanningAgent::~PlanningAgent() {}
 
-const Territory *PlanningAgent::selectUnoccupiedTerritory(const std::map<std::string, Territory *> &unoccupied_territories)
+const Territory *PlanningAgent::chooseTerritory(const std::vector<Territory *> &valid_territories, bool choose_unoccupied)
 {
-  // Prefer to choose territories that are adjacent to currently owned territories.
-  const Territory *to_select;
-  int max_adjacent = -1;
-  for (auto iter = begin(unoccupied_territories); iter != end(unoccupied_territories); iter++)
+  if (choose_unoccupied)
   {
-    const Territory *current_territory = iter->second;
-    int count = countFriendlyNeighbors(current_territory);
-    if (max_adjacent < count)
+    // Prefer to choose territories that are adjacent to currently owned territories.'
+    const Territory *to_select;
+    int max_adjacent = -1;
+    for (auto iter = begin(valid_territories); iter != end(valid_territories); iter++)
     {
-      to_select = current_territory;
-      max_adjacent = count;
+      const Territory *current_territory = *iter;
+      int count = countFriendlyNeighbors(current_territory);
+      if (max_adjacent < count)
+      {
+        to_select = current_territory;
+        max_adjacent = count;
+      }
     }
+    return to_select;
   }
-  return to_select;
+  else
+  {
+    // choose a territory that is already owned.
+    // TODO: implement strategy.
+    int rand_index = getRandomInt(0, territories.size() - 1);
+    return territories.at(rand_index);
+  }
 }
 
 std::tuple<const Territory *, int> PlanningAgent::reinforce(int total_reinforcements)

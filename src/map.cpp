@@ -91,12 +91,25 @@ const Territory *Map::getTerritory(const std::string &name) const
   return iter->second;
 }
 
-const std::vector<Territory *> Map::getTerritories() const
+const std::vector<Territory *> &Map::getTerritories() const
 {
   return territories;
 }
 
-const std::map<std::string, Territory *> Map::getNamedTerritories() const
+const std::vector<Territory *> Map::getTerritories(int player_id) const
+{
+  std::vector<Territory *> ts;
+  for (auto &t : territories)
+  {
+    if (t->getOccupierId() == player_id)
+    {
+      ts.push_back(t);
+    }
+  }
+  return ts;
+}
+
+const std::map<std::string, Territory *> &Map::getNamedTerritories() const
 {
   return named_territories;
 }

@@ -30,8 +30,9 @@ public:
 
   const Territory *getTerritory(const std::string &name) const;
 
-  const std::map<std::string, Territory *> getNamedTerritories() const;
-  const std::vector<Territory *> getTerritories() const; // Note: this is copying the map...
+  const std::map<std::string, Territory *> &getNamedTerritories() const;
+  const std::vector<Territory *> &getTerritories() const;
+  const std::vector<Territory *> getTerritories(int player_id) const;
 
   bool areConnected(const Territory *, const Territory *) const;
 

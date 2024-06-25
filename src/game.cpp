@@ -1,6 +1,5 @@
 #include "game.h"
 
-// Testing...
 #include <iostream>
 
 #include <cstdlib>
@@ -30,13 +29,23 @@ Game::~Game()
 
 bool Game::run()
 {
+  // Players roll the dice to determine who will go first.
+
   // The game starts with players claiming territories until all are taken.
+  // The first player places one army, second player places one army on unoccupied
+  // territory, ... so on until all territories claimed.
+
+  // Then, first player places second army on any of his territories, and so on
+  // until all armies are placed.
   claimTerritories();
   // Each player distributes their remaining units throughout their owned territories.
+
+  /*
   for (auto iter = begin(players); iter != end(players); iter++)
   {
     assignReinforcements(*iter);
   }
+  */
   first_turn = false;
   // Now each player takes their 3 step turn until the game is over.
   auto iter = begin(players);
@@ -74,27 +83,58 @@ bool Game::isOver()
 
 void Game::claimTerritories()
 {
-  // We're assuming that no funny business has gone on to assign players to territories before hand...
-  std::map<std::string, Territory *> unoccupied_territories = map.getTerritories();
+  // In this instance I do want a copy, but in general maybe not?
+  std::vector<Territory *> unoccupied_territories = map.getTerritories();
 
-  auto iter = begin(players);
-  // While there are still unoccupied territories...
+  // Keep track of how many units each player has to place.
+  std::vector<int> armies = std::vector<int>(players.size(), initial_army_size[players.size()]);
+
+  int i = 0;
   while (!unoccupied_territories.empty())
   {
-    IAgent *player = *iter;
+    IAgent *player = players.at(i);
     // Ask the player to choose a territory.
-    Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories);
+    Territory *territory = askAgentToChooseTerritory(player, unoccupied_territories, true);
     console.inform(player->getName() + " takes " + territory->getName());
     // Assign that territory to the player.
     assignTerritoryToAgent(territory, player, 1);
     // Remove the territory from the unoccupied list.
-    unoccupied_territories.erase(territory->getName());
+    unoccupied_territories.erase(
+        std::find(unoccupied_territories.begin(), unoccupied_territories.end(), territory));
+
+    // Decrement the number of armies this player has.
+    --armies.at(i);
     // Move on to the next player.
     // std::this_thread::sleep_for(std::chrono::seconds(1));
-    iter++;
-    if (iter == end(players))
+    i = (i < players.size() - 1) ? i + 1 : 0;
+  }
+  // All players still have some armies left at the end of the previous loop.
+  i = 0;
+  bool armies_left = true;
+  while (armies_left)
+  {
+    armies_left = false;
+    // Start with the first player, ask each player to reinforce one territory
+    // they own until all players are out of units.
+    if (armies.at(i) > 0)
     {
-      iter = begin(players);
+      IAgent *player = players.at(i);
+      // need to implement the below. Can reuse the same function, rather just need to
+      // pass in a container of territories that the player owns instead of a container
+      // of unoccupied territories.
+      Territory *territory = askAgentToChooseTerritory(player, map.getTerritories(player->getId()), false);
+      // reinforce that territory with one unit.
+      territory->reinforce(1);
+      // decrement the player's units.
+      --armies.at(i);
+      // if this player still has units, set armies_left to true.
+      if (armies.at(i) > 0)
+      {
+        armies_left = true;
+      }
+      // move on to the next player.
+      i = (i < players.size() - 1) ? i + 1 : 0;
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
 }
@@ -249,15 +289,30 @@ std::tuple<Territory *, int> Game::askAgentToReinforce(IAgent *agent, int total_
   return std::make_tuple(const_cast<Territory *>(territory), reinforcements);
 }
 
-Territory *Game::askAgentToChooseTerritory(IAgent *agent, const std::map<std::string, Territory *> &unoccupied_territories)
+Territory *Game::askAgentToChooseTerritory(IAgent *agent,
+                                           const std::vector<Territory *> &valid_territories,
+                                           bool choose_unoccupied)
 {
-  // Agent must return an unoccupied territory.
-  Territory *territory = const_cast<Territory *>(agent->selectUnoccupiedTerritory(unoccupied_territories));
-  while (territory->isOccupied())
+  const Territory *territory;
+  if (choose_unoccupied)
   {
-    territory = const_cast<Territory *>(agent->selectUnoccupiedTerritory(unoccupied_territories));
+    // First, agent must choose unoccupied territories.
+    territory = agent->chooseTerritory(valid_territories, true);
+    while (territory->isOccupied())
+    {
+      territory = agent->chooseTerritory(valid_territories, true);
+    }
   }
-  return territory;
+  // Then, they must choose to reinforce territories they own.
+  else
+  {
+    territory = agent->chooseTerritory(valid_territories, false);
+    while (territory->getOccupierId() != agent->getId())
+    {
+      territory = agent->chooseTerritory(valid_territories, false);
+    }
+  }
+  return const_cast<Territory *>(territory);
 }
 
 std::tuple<Territory *, Territory *, int> Game::askAgentToAttack(IAgent *agent)
@@ -282,6 +337,8 @@ std::tuple<Territory *, Territory *, int> Game::askAgentToAttack(IAgent *agent)
       return std::make_tuple(nullptr, nullptr, 0);
     }
   }
+  // we're casting away const here because Game is allowed to modify territories but no agent should
+  // be able to touch them directly.
   return std::make_tuple(const_cast<Territory *>(to), const_cast<Territory *>(from), attacking_units);
 }
 
