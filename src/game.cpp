@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <iostream>
-
 #include <cstdlib>
 #include <ctime>
 
@@ -10,7 +9,8 @@ const int Game::initial_army_size[] = {0, 0, 50, 35, 30, 25, 20};
 Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(5, screen_size),
                                                                         map(map_file,
                                                                             sf::Vector2<int>(0, 0),
-                                                                            sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y))
+                                                                            sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
+                                                                        g(rd())
 {
   std::srand((unsigned)std::time(0));
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
@@ -18,6 +18,22 @@ Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(
   players.push_back(new RandomAgent(map, 1, "Purple", sf::Color::Magenta));
   players.push_back(new RandomAgent(map, 2, "Blue", sf::Color::Blue));
   players.push_back(new RandomAgent(map, 3, "Green", sf::Color::Green));
+
+  // create the deck of cards.
+  std::vector<std::string> types = {"foot", "cavalry", "artillery"};
+  int type_idx = 0;
+  std::vector<Territory *> shuffled_territories = map.getTerritories();
+  std::shuffle(begin(shuffled_territories), end(shuffled_territories), g);
+  for (int t_idx = 0; t_idx < shuffled_territories.size(); ++t_idx)
+  {
+    Card card;
+    card.id = t_idx;
+    card.type = types.at(type_idx);
+    card.territory = shuffled_territories.at(t_idx)->getName();
+    card_pile.push_back(card);
+
+    type_idx = (type_idx == 2) ? 0 : type_idx + 1;
+  }
 }
 
 Game::~Game()
@@ -30,6 +46,12 @@ Game::~Game()
 
 bool Game::run()
 {
+  // testing
+  for (const auto &card : card_pile)
+  {
+    std::cout << card.id << " : " << card.type << " : " << card.territory << std::endl;
+  }
+
   // Players roll the dice to determine who will go first.
 
   // The game starts with players claiming territories until all are taken.

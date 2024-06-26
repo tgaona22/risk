@@ -14,6 +14,14 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
+#include <random>
+
+struct Card
+{
+  int id;
+  std::string territory;
+  std::string type;
+};
 
 class Game
 {
@@ -21,6 +29,11 @@ private:
   std::vector<IAgent *> players;
   Console console;
   Map map;
+
+  std::vector<Card> card_pile;
+
+  std::random_device rd;
+  std::mt19937 g;
 
   const static int initial_army_size[];
 
