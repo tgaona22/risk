@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "territory.h"
+#include "i_agent.h"
 #include <vector>
 #include <queue>
 #include <map>
@@ -33,6 +34,10 @@ public:
   const std::map<std::string, Territory *> &getNamedTerritories() const;
   const std::vector<Territory *> &getTerritories() const;
   const std::vector<Territory *> getTerritories(int player_id) const;
+
+  std::map<std::string, int> continentOwners() const;
+  std::vector<std::string> getContinents(int player_id) const;
+  const std::map<std::string, int> &getContinentsBonus() const { return continents_bonus; }
 
   bool areConnected(const Territory *, const Territory *) const;
 

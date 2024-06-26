@@ -22,7 +22,6 @@ private:
   Console console;
   Map map;
 
-  bool first_turn;
   const static int initial_army_size[];
 
 public:

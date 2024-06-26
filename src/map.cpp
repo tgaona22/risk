@@ -18,6 +18,9 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
   {
     std::string cont_name = cont["name"];
     int cont_bonus = cont["bonus"];
+
+    continents_bonus[cont_name] = cont_bonus;
+
     for (auto &t : cont["territories"])
     {
       Territory *territory = new Territory(t["name"], cont, t["x"], t["y"]);
@@ -156,4 +159,49 @@ double Map::getUnitAverage() const
     total = total + iter->second->getUnits();
   }
   return total / named_territories.size();
+}
+
+std::map<std::string, int> Map::continentOwners() const
+{
+  std::map<std::string, int> result;
+  for (const auto &c : continents)
+  {
+    std::vector<Territory *> c_ts = c.second;
+    int pid = c_ts.at(0)->getOccupierId();
+    bool owns_all = true;
+    for (const auto t : c_ts)
+    {
+      if (t->getOccupierId() != pid)
+      {
+        owns_all = false;
+        break;
+      }
+    }
+
+    result[c.first] = (owns_all) ? pid : -1;
+  }
+  return result;
+}
+
+std::vector<std::string> Map::getContinents(int player_id) const
+{
+  std::vector<std::string> p_cs;
+  for (const auto &c : continents)
+  {
+    std::vector<Territory *> ts = c.second;
+    bool owns_c = true;
+    for (const auto t : ts)
+    {
+      if (t->getOccupierId() != player_id)
+      {
+        owns_c = false;
+        break;
+      }
+    }
+    if (owns_c)
+    {
+      p_cs.push_back(c.first);
+    }
+  }
+  return p_cs;
 }

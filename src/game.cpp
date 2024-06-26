@@ -8,8 +8,9 @@
 const int Game::initial_army_size[] = {0, 0, 50, 35, 30, 25, 20};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(5, screen_size),
-                                                                        map(map_file, sf::Vector2<int>(0, 0), sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
-                                                                        first_turn(true)
+                                                                        map(map_file,
+                                                                            sf::Vector2<int>(0, 0),
+                                                                            sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y))
 {
   std::srand((unsigned)std::time(0));
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
@@ -38,15 +39,7 @@ bool Game::run()
   // Then, first player places second army on any of his territories, and so on
   // until all armies are placed.
   claimTerritories();
-  // Each player distributes their remaining units throughout their owned territories.
 
-  /*
-  for (auto iter = begin(players); iter != end(players); iter++)
-  {
-    assignReinforcements(*iter);
-  }
-  */
-  first_turn = false;
   // Now each player takes their 3 step turn until the game is over.
   auto iter = begin(players);
   while (!isOver())
@@ -134,7 +127,7 @@ void Game::claimTerritories()
       }
       // move on to the next player.
       i = (i < players.size() - 1) ? i + 1 : 0;
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      // std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
 }
@@ -243,6 +236,9 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
 void Game::assignReinforcements(IAgent *player)
 {
   int total_reinforcements = getNumberOfReinforcements(player);
+
+  std::cout << player->getName() << " has " << total_reinforcements << " reinforcements.\n";
+
   Territory *territory;
   int reinforcements;
 
@@ -257,14 +253,9 @@ void Game::assignReinforcements(IAgent *player)
 
 int Game::getNumberOfReinforcements(IAgent *player)
 {
-  int reinforcements = 0;
+  int reinforcements;
   int player_territories = player->getNumberOfTerritories();
-  // On the first turn, each player gets extra units.
-  if (first_turn)
-  {
-    reinforcements = initial_army_size[players.size()] - player_territories;
-  }
-  else if (player_territories <= 9)
+  if (player_territories <= 9)
   {
     reinforcements = 3;
   }
@@ -272,6 +263,16 @@ int Game::getNumberOfReinforcements(IAgent *player)
   {
     reinforcements = player_territories / 3;
   }
+
+  // Determine if player owns any continents and get their bonus.
+  std::vector<std::string> player_continents = map.getContinents(player->getId());
+  const std::map<std::string, int> continents_bonus = map.getContinentsBonus();
+  for (auto &name : player_continents)
+  {
+    std::cout << player->getName() << " owns " << name << std::endl;
+    reinforcements += continents_bonus.at(name);
+  }
+
   return reinforcements;
 }
 
