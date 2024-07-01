@@ -21,6 +21,7 @@ class Game
 {
 private:
   std::vector<IAgent *> players;
+  std::vector<bool> is_active;
   Console console;
   Map map;
 

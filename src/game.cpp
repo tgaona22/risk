@@ -13,7 +13,8 @@ Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(
                                                                             sf::Vector2<int>(0, 0),
                                                                             sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
                                                                         g(rd()),
-                                                                        cardset_counter(0)
+                                                                        cardset_counter(0),
+                                                                        is_active(4, true)
 {
   std::srand((unsigned)std::time(0));
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
@@ -83,12 +84,13 @@ bool Game::run()
     if (player->getNumberOfTerritories() > 0)
     {
       takeTurn(*iter);
-      iter++;
     }
     else
     {
-      iter = players.erase(std::find(begin(players), end(players), player));
+      // iter = players.erase(std::find(begin(players), end(players), player));
+      is_active.at(player->getId()) = false;
     }
+    iter++;
     // Move on to the next player.
 
     // this is very dumb apparently to increment the iterator here.
@@ -104,7 +106,12 @@ bool Game::run()
 
 bool Game::isOver()
 {
-  return players.size() == 1;
+  int active_count = 0;
+  for (auto b : is_active)
+  {
+    active_count += b ? 1 : 0;
+  }
+  return active_count == 1;
 }
 
 void Game::claimTerritories()
