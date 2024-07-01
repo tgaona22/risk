@@ -39,7 +39,7 @@ void Console::initCmdLine(const sf::Vector2<int> &window_size)
 void Console::initLog(int length, const sf::Vector2<int> &window_size)
 {
   log_length = length;
-  log_max = 8;
+  log_max = 100;
   log_position = window_size.y - 2 * font_size;
   log_offset = 0;
 }
@@ -75,6 +75,7 @@ void Console::inform(const std::string &msg)
 
 void Console::addToLog(const std::string &msg, sf::Color color = sf::Color::Green)
 {
+  std::lock_guard<std::mutex> lock(log_mtx);
   sf::Text *msg_text = new sf::Text(msg, font, font_size);
   msg_text->setColor(color);
   log.push_front(msg_text);
@@ -132,11 +133,13 @@ bool Console::enterCommand()
  * messages in the log if *up* is false. */
 void Console::scroll(bool up)
 {
+  std::lock_guard<std::mutex> lock(log_mtx);
   if (up)
   {
     if (log_offset + log_length < log.size())
     {
       log_offset = log_offset + 1;
+      std::cout << "up " << log_offset << "\n";
     }
   }
   else
@@ -144,6 +147,7 @@ void Console::scroll(bool up)
     if (log_offset > 0)
     {
       log_offset = log_offset - 1;
+      std::cout << "down " << log_offset << "\n";
     }
   }
   updateLogPositions();
@@ -153,6 +157,7 @@ void Console::scroll(bool up)
  * the command line and a subset of the message log. */
 void Console::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
+  std::lock_guard<std::mutex> lock(log_mtx);
   // Display the command line.
   target.draw(cmdline);
   // Display log_length number of messages starting from log_offset.

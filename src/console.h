@@ -5,6 +5,7 @@
 #include <vector>
 #include <deque>
 #include <string>
+#include <mutex>
 
 class Console : public sf::Drawable
 {
@@ -27,6 +28,8 @@ private:
   int font_size;
   sf::Vector2<int> position; // the upper left hand corner of the console.
   sf::Vector2<int> size;     // the length and width of the console.
+
+  mutable std::mutex log_mtx;
 
 public:
   // Constructor and destructor
