@@ -8,7 +8,7 @@
 const int Game::initial_army_size[] = {0, 0, 50, 35, 30, 25, 20};
 const int Game::card_reinforcements[] = {4, 6, 8, 10, 12, 15, 20, 25};
 
-Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(5, screen_size),
+Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(10, screen_size),
                                                                         map(map_file,
                                                                             sf::Vector2<int>(0, 0),
                                                                             sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
@@ -372,11 +372,12 @@ int Game::getNumberOfReinforcements(IAgent *player)
       std::vector<Card> cs = {c1, c2, c3};
       for (int i = 0; i < 3; ++i)
       {
-        // remove card from player's pile
-        std::remove_if(
+        // remove card from player's pile -- std::remove doesn't act the way I expect it to.
+        auto it = std::find_if(
             begin(player->cards),
             end(player->cards),
             std::bind(card_eq, std::placeholders::_1, cs.at(i)));
+        player->cards.erase(it);
         // add card to bottom of the game pile.
         card_pile.insert(begin(card_pile), cs.at(i));
         // alternatively, we could put them on top and shuffle the deck.
@@ -392,6 +393,24 @@ int Game::getNumberOfReinforcements(IAgent *player)
         card_bonus = card_reinforcements[7] + 5 * (cardset_counter - 7);
       }
       ++cardset_counter;
+      std::cout << player->getName() << " receives " << card_bonus << "reinforcements.";
+
+      reinforcements += card_bonus;
+      // if player owns territories corresponding to turned in cards, those
+      // territories get a bonus two reinforcements.
+      for (int i = 0; i < 3; ++i)
+      {
+        Card c = cs.at(i);
+        if (c.territory != "joker")
+        {
+          Territory *t = const_cast<Territory *>(map.getTerritory(c.territory));
+          if (t->getOccupierId() == player->getId())
+          {
+            std::cout << player->getName() << " gets bonus 2 for owning " << c.territory << "\n";
+            t->reinforce(2);
+          }
+        }
+      }
     }
   }
 
@@ -494,8 +513,6 @@ std::tuple<Territory *, Territory *, int> Game::askAgentToFortify(IAgent *agent)
   /* Agent must return a territory they own, another territory they own, and a number
      that is strictly less than the number of units in the territory being moved from.
      If the agent does not wish to fortify, it should return nullptr for the territories. */
-  // TODO: The rules state there should be a path between the two territories. Need to implement this functionality in Map class.
-  // DONE!
   const Territory *to, *from;
   int fortifying_units;
   std::tie(to, from, fortifying_units) = agent->fortify();
