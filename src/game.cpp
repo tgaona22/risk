@@ -3,14 +3,17 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 
 const int Game::initial_army_size[] = {0, 0, 50, 35, 30, 25, 20};
+const int Game::card_reinforcements[] = {4, 6, 8, 10, 12, 15, 20, 25};
 
 Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(5, screen_size),
                                                                         map(map_file,
                                                                             sf::Vector2<int>(0, 0),
                                                                             sf::Vector2<int>(screen_size.x, screen_size.y - console.getSize().y)),
-                                                                        g(rd())
+                                                                        g(rd()),
+                                                                        cardset_counter(0)
 {
   std::srand((unsigned)std::time(0));
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
@@ -33,6 +36,14 @@ Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(
     card_pile.push_back(card);
 
     type_idx = (type_idx == 2) ? 0 : type_idx + 1;
+  }
+  for (int i = 0; i < 2; ++i)
+  {
+    Card joker;
+    joker.id = card_pile.size() + i;
+    joker.type = "joker";
+    joker.territory = "joker";
+    card_pile.push_back(joker);
   }
 }
 
@@ -156,6 +167,7 @@ void Game::claimTerritories()
 
 void Game::takeTurn(IAgent *player)
 {
+  bool earns_card = false;
   // Player assigns reinforcements.
   assignReinforcements(player);
 
@@ -173,7 +185,11 @@ void Game::takeTurn(IAgent *player)
       IAgent *defender = players.at(to->getOccupierId());
       int defending_units = askAgentToDefend(defender, to, from, attacking_units);
       console.inform(player->getName() + " attacks " + to->getName() + " from " + from->getName() + " with " + std::to_string(attacking_units) + " units. " + defender->getName() + " defends with " + std::to_string(defending_units) + " units.");
-      resolveBattle(from, to, attacking_units, defending_units);
+      bool captured = resolveBattle(from, to, attacking_units, defending_units);
+      if (captured)
+      {
+        earns_card = true;
+      }
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
   } while (to != nullptr);
@@ -191,10 +207,25 @@ void Game::takeTurn(IAgent *player)
   }
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
+  // Ask the player to draw a card if they captured a territory.
+  if (earns_card)
+  {
+    bool draws = player->drawCard();
+    if (draws)
+    {
+      // Perhaps we should throw an exception if the card_pile is empty?
+      Card card = card_pile.at(card_pile.size() - 1);
+      card_pile.pop_back();
+      player->cards.push_back(card);
+
+      std::cout << player->getName() << " draws " << cardstr(card) << "\n";
+    }
+  }
 }
 
-void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units)
+bool Game::resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units)
 {
+  bool captured = false;
   int *attacker_dice = new int[attacking_units];
   int *defender_dice = new int[defending_units];
   // Roll the dice.
@@ -248,15 +279,20 @@ void Game::resolveBattle(Territory *attacker, Territory *defender, int attacking
     int capturing_units = askAgentToCapture(attacking_agent, attacker, defender, attacking_units - attacker_loss);
     assignTerritoryToAgent(defender, attacking_agent, capturing_units);
     attacker->reinforce(-capturing_units);
+    captured = true;
   }
 
   // Inform the attacker and defender of the outcome.
-  players.at(attacker->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(), attacker_loss, defender_loss, defender->getUnits() == 0);
-  players.at(defender->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(), attacker_loss, defender_loss, defender->getUnits() == 0);
+  players.at(attacker->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(), attacker_loss, defender_loss, captured);
+  players.at(defender->getOccupierId())->informOfBattleOutcome(attacker->getOccupierId(), defender->getOccupierId(), attacker_loss, defender_loss, captured);
+  return captured;
 }
 
 void Game::assignReinforcements(IAgent *player)
 {
+  // Handle card logic.
+  // If they have more than 5, they must choose a triplet to turn in.
+  // Otherwise, they have a chance to turn in cards and gain more reinforcements
   int total_reinforcements = getNumberOfReinforcements(player);
 
   std::cout << player->getName() << " has " << total_reinforcements << " reinforcements.\n";
@@ -293,6 +329,70 @@ int Game::getNumberOfReinforcements(IAgent *player)
   {
     std::cout << player->getName() << " owns " << name << std::endl;
     reinforcements += continents_bonus.at(name);
+  }
+
+  // Check if player has enough cards to turn in.
+  // Return a tuple of CardSets, if it's not empty
+  // let the player choose one or None. Unless the player
+  // has more than five cards, they are forced to turn in a set.
+  std::vector<std::tuple<int, int, int>> card_sets = findCardSets(player);
+  if (!card_sets.empty())
+  {
+    std::cout << player->getName() << " has " << card_sets.size() << " cardsets.\n";
+    for (int i = 0; i < card_sets.size(); ++i)
+    {
+      int a, b, c;
+      std::tie(a, b, c) = card_sets.at(i);
+      Card c1, c2, c3;
+      c1 = player->cards.at(a);
+      c2 = player->cards.at(b);
+      c3 = player->cards.at(c);
+      std::cout << "\t" << cardstr(c1) << " " << cardstr(c2) << " " << cardstr(c3) << "\n";
+    }
+    // Ask player if they want to turn in a set of cards.
+    CardSet cards_turned_in = player->turnInCards(card_sets);
+    // if they have more than 5 cards, they must turn in a set.
+    bool skip = std::get<0>(cards_turned_in).id == -1;
+    while (skip && player->cards.size() > 5)
+    {
+      cards_turned_in = player->turnInCards(card_sets);
+      skip = std::get<0>(cards_turned_in).id == -1;
+    }
+
+    if (!skip)
+    {
+      // remove the cards from the player's pile
+      auto card_eq = [](const Card &a, const Card &b)
+      {
+        return a.id == b.id;
+      };
+      Card c1 = std::get<0>(cards_turned_in);
+      Card c2 = std::get<1>(cards_turned_in);
+      Card c3 = std::get<2>(cards_turned_in);
+      std::vector<Card> cs = {c1, c2, c3};
+      for (int i = 0; i < 3; ++i)
+      {
+        // remove card from player's pile
+        std::remove_if(
+            begin(player->cards),
+            end(player->cards),
+            std::bind(card_eq, std::placeholders::_1, cs.at(i)));
+        // add card to bottom of the game pile.
+        card_pile.insert(begin(card_pile), cs.at(i));
+        // alternatively, we could put them on top and shuffle the deck.
+      }
+      // add to the reinforcements and increment the counter.
+      int card_bonus;
+      if (cardset_counter < 8)
+      {
+        card_bonus = card_reinforcements[cardset_counter];
+      }
+      else
+      {
+        card_bonus = card_reinforcements[7] + 5 * (cardset_counter - 7);
+      }
+      ++cardset_counter;
+    }
   }
 
   return reinforcements;
@@ -443,4 +543,42 @@ int Game::findMax(int *arr, int size)
     }
   }
   return max_index;
+}
+
+std::vector<std::tuple<int, int, int>> Game::findCardSets(IAgent *player)
+{
+  std::vector<std::tuple<int, int, int>> sets;
+  // look through all combinations of three cards.
+  std::vector<Card> cards = player->cards;
+  if (cards.size() < 3)
+  {
+    return sets;
+  }
+
+  for (int i = 0; i < cards.size(); ++i)
+  {
+    for (int j = i + 1; j < cards.size(); ++j)
+    {
+      for (int k = j + 1; k < cards.size(); ++k)
+      {
+        Card a = cards.at(i);
+        Card b = cards.at(j);
+        Card c = cards.at(k);
+
+        if (a.type == "joker" || b.type == "joker" || c.type == "joker")
+        {
+          sets.push_back(std::tie(i, j, k));
+        }
+        else if (a.type == b.type && a.type == c.type)
+        {
+          sets.push_back(std::tie(i, j, k));
+        }
+        else if (a.type != b.type && b.type != c.type && c.type != a.type)
+        {
+          sets.push_back(std::tie(i, j, k));
+        }
+      }
+    }
+  }
+  return sets;
 }

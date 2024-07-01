@@ -8,6 +8,7 @@
 #include "human_agent.h"
 #include "random_agent.h"
 #include "planning_agent.h"
+#include "card.h"
 
 #include <vector>
 #include <tuple>
@@ -15,13 +16,6 @@
 #include <chrono>
 #include <algorithm>
 #include <random>
-
-struct Card
-{
-  int id;
-  std::string territory;
-  std::string type;
-};
 
 class Game
 {
@@ -36,6 +30,8 @@ private:
   std::mt19937 g;
 
   const static int initial_army_size[];
+  const static int card_reinforcements[];
+  int cardset_counter;
 
 public:
   Game(sf::Vector2<int> screen_size, const std::string &map_file);
@@ -60,13 +56,16 @@ private:
   int askAgentToCapture(IAgent *agent, Territory *from, Territory *to, int attacking_units);
   std::tuple<Territory *, Territory *, int> askAgentToFortify(IAgent *agent);
 
-  void resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units);
+  // resolveBattle returns True iff attacker captures the territory.
+  bool resolveBattle(Territory *attacker, Territory *defender, int attacking_units, int defending_units);
   int rollDie();
   int findMax(int *arr, int size);
 
   void assignTerritoryToAgent(Territory *territory, IAgent *agent, int units);
   int getNumberOfReinforcements(IAgent *player);
   void assignReinforcements(IAgent *player);
+
+  std::vector<std::tuple<int, int, int>> findCardSets(IAgent *player);
 };
 
 #endif

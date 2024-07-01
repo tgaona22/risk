@@ -52,9 +52,9 @@ std::tuple<const Territory *, int> PlanningAgent::reinforce(int total_reinforcem
 
 std::tuple<const Territory *, const Territory *, int> PlanningAgent::attack()
 {
-  std::cout << "---- ATTACKING ----";
-  std::cout << "Unit budget: " << unit_budget << std::endl;
-  // If we have spent our allotted units, pass.
+  // std::cout << "---- ATTACKING ----";
+  // std::cout << "Unit budget: " << unit_budget << std::endl;
+  //  If we have spent our allotted units, pass.
   if (unit_budget == 0 && has_attack_plan)
   {
     has_attack_plan = false;
@@ -96,8 +96,8 @@ std::tuple<const Territory *, const Territory *, int> PlanningAgent::attack()
 
   int attacking_units = std::min(unit_budget, std::min(3, attacker->getUnits() - 1));
   // In the informOfBattleOutcome method we update the unit budget with the number of lost troops.
-  std::cout << "Planner tries to attack " << attack_target->getName() << " from "
-            << attacker->getName() << " with " << attacking_units << " units.\n";
+  // std::cout << "Planner tries to attack " << attack_target->getName() << " from "
+  //         << attacker->getName() << " with " << attacking_units << " units.\n";
   return std::make_tuple(attack_target, attacker, attacking_units);
 }
 
@@ -187,8 +187,8 @@ std::tuple<const Territory *, const Territory *, int> PlanningAgent::fortify()
   }
   double ratio = greatest_threat / least_threat;
   int units_to_move = std::min(static_cast<int>(floor(ratio)), least_threatened->getUnits() - 1);
-  std::cout << "Planner is trying to fortify " << most_threatened->getName() << " from " << least_threatened->getName()
-            << " with " << units_to_move << " units.\n";
+  // std::cout << "Planner is trying to fortify " << most_threatened->getName() << " from " << least_threatened->getName()
+  //           << " with " << units_to_move << " units.\n";
   return std::make_tuple(most_threatened, least_threatened, units_to_move);
 }
 
@@ -228,8 +228,8 @@ void PlanningAgent::selectTarget()
     average_unit_losses.push_back(std::make_tuple(*iter, avg_units_lost));
     attack_values.push_back(std::make_tuple(*iter, evaluateAttackValue(*iter)));
 
-    std::cout << (*iter)->getName() << ": " << avg_wins << "; " << avg_units_lost << "; "
-              << evaluateAttackValue(*iter) << std::endl;
+    // std::cout << (*iter)->getName() << ": " << avg_wins << "; " << avg_units_lost << "; "
+    //           << evaluateAttackValue(*iter) << std::endl;
   }
   // Sort each list. Also, we value losing few units, so reverse that list.
   std::sort(begin(average_wins), end(average_wins), PlanningAgent::compareTerritories);
@@ -242,14 +242,14 @@ void PlanningAgent::selectTarget()
   {
     // A lower rank means a better choice.
     int rank = getRank(*iter, average_wins) + getRank(*iter, average_unit_losses) + getRank(*iter, attack_values);
-    std::cout << (*iter)->getName() << " has rank " << rank << std::endl;
+    // std::cout << (*iter)->getName() << " has rank " << rank << std::endl;
     if (rank < best_rank)
     {
       attack_target = *iter;
       best_rank = rank;
     }
   }
-  std::cout << "THE TARGET IS " << attack_target->getName() << std::endl;
+  // std::cout << "THE TARGET IS " << attack_target->getName() << std::endl;
 }
 
 void PlanningAgent::allocateReinforcements(int total_reinforcements)
@@ -276,8 +276,8 @@ void PlanningAgent::allocateReinforcements(int total_reinforcements)
     int to_allocate = static_cast<int>(std::floor(threat_percentage * total_reinforcements));
 
     const Territory *t = std::get<0>(*iter);
-    std::cout << t->getName() << " has threat = " << threat << " and threat percentage = " << threat_percentage << std::endl;
-    std::cout << "Allocating " << to_allocate << " units to " << t->getName() << std::endl;
+    // std::cout << t->getName() << " has threat = " << threat << " and threat percentage = " << threat_percentage << std::endl;
+    // std::cout << "Allocating " << to_allocate << " units to " << t->getName() << std::endl;
 
     allocated = allocated + to_allocate;
     reinforcements.push_back(to_allocate);
@@ -319,8 +319,8 @@ std::tuple<double, double> PlanningAgent::simulateAttack(const Territory *target
   }
   total_attackers = std::min(total_attackers, attackers_budget);
 
-  std::cout << "Total attackers of " << target->getName() << ": " << total_attackers
-            << "; Defenders: " << target->getUnits() << std::endl;
+  // std::cout << "Total attackers of " << target->getName() << ": " << total_attackers
+  //         << "; Defenders: " << target->getUnits() << std::endl;
 
   int total_wins = 0, total_units_lost = 0;
   // Run an attack simulation N times.

@@ -52,3 +52,19 @@ const sf::Color &IAgent::getColor() const
 {
   return color;
 }
+
+bool IAgent::drawCard()
+{
+  return true;
+}
+
+CardSet IAgent::turnInCards(const std::vector<std::tuple<int, int, int>> &card_sets)
+{
+  // A default implementation will be to return the first card set.
+  std::tuple<int, int, int> t = card_sets.at(0);
+  int i = std::get<0>(t);
+  int j = std::get<1>(t);
+  int k = std::get<2>(t);
+  CardSet cards_turned_in = std::tie(cards.at(i), cards.at(j), cards.at(k));
+  return cards_turned_in;
+}

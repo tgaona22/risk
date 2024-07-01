@@ -21,12 +21,16 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
 
     continents_bonus[cont_name] = cont_bonus;
 
+    std::vector<Territory *> c_ts;
+
     for (auto &t : cont["territories"])
     {
       Territory *territory = new Territory(t["name"], cont, t["x"], t["y"]);
       named_territories.emplace(t["name"], territory);
       territories.push_back(territory);
+      c_ts.push_back(territory);
     }
+    continents[cont_name] = c_ts;
   }
 
   // Initialize each territory's list of neighbors.
@@ -48,8 +52,8 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
         }
         else if (t->getName().compare("Kamchatka") == 0 && n->getName().compare("Alaska") == 0)
         {
-          connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(105, 105, 105)));
-          connecting_lines.push_back(sf::Vertex(sf::Vector2f(size.x, 110), sf::Color(105, 105, 105)));
+          connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(255, 0, 0)));
+          connecting_lines.push_back(sf::Vertex(sf::Vector2f(size.x, 110), sf::Color(255, 0, 0)));
         }
         else
         {
