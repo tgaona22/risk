@@ -1,5 +1,0 @@
-Germany 100 100 Ukraine Italy
-Italy 100 150 Germany Egypt Ukraine
-Egypt 160 150 Italy Ukraine
-Ukraine 160 100 Germany Italy Egypt Russia
-Russia 220 50 Ukraine

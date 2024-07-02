@@ -1,0 +1,502 @@
+[
+    {
+        "name": "Europe",
+        "bonus": 5,
+        "color": [70, 130, 180, 255],
+        "territories": [
+            {
+                "name": "Iceland",
+                "x": 300,
+                "y": 100,
+                "neighbors": [
+                    "GreatBritain",
+                    "Scandinavia",
+                    "Greenland"
+                ]
+            },
+            {
+                "name": "GreatBritain",
+                "x": 300,
+                "y": 160,
+                "neighbors": [
+                    "Iceland",
+                    "Scandinavia",
+                    "NorthernEurope",
+                    "WesternEurope"
+                ]
+            },
+            {
+                "name": "Scandinavia",
+                "x": 370,
+                "y": 100,
+                "neighbors": [
+                    "Iceland",
+                    "GreatBritain",
+                    "NorthernEurope",
+                    "Ukraine"
+                ]
+            },
+            {
+                "name": "Ukraine",
+                "x": 430,
+                "y": 140,
+                "neighbors": [
+                    "Scandinavia",
+                    "NorthernEurope",
+                    "SouthernEurope",
+                    "MiddleEast",
+                    "Afghanistan",
+                    "Ural"
+                ]
+            },
+            {
+                "name": "NorthernEurope",
+                "x": 360,
+                "y": 160,
+                "neighbors": [
+                    "GreatBritain",
+                    "Scandinavia",
+                    "WesternEurope",
+                    "SouthernEurope",
+                    "Ukraine"
+                ]
+            },
+            {
+                "name": "WesternEurope",
+                "x": 290,
+                "y": 220,
+                "neighbors": [
+                    "GreatBritain",
+                    "NorthernEurope",
+                    "SouthernEurope",
+                    "NorthAfrica"
+                ]
+            },
+            {
+                "name": "SouthernEurope",
+                "x": 350,
+                "y": 240,
+                "neighbors": [
+                    "WesternEurope",
+                    "NorthernEurope",
+                    "Ukraine",
+                    "NorthAfrica",
+                    "MiddleEast",
+                    "Egypt"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "NorthAmerica",
+        "bonus": 5,
+        "color": [255, 99, 71, 255],
+        "territories": [
+            {
+                "name": "Greenland",
+                "x": 260,
+                "y": 60,
+                "neighbors": [
+                    "Iceland",
+                    "NorthwestTerritory",
+                    "Ontario",
+                    "Quebec"
+                ]
+            },
+            {
+                "name": "Quebec",
+                "x": 240,
+                "y": 130,
+                "neighbors": [
+                    "Greenland",
+                    "Ontario",
+                    "EasternUS"
+                ]
+            },
+            {
+                "name": "Ontario",
+                "x": 200,
+                "y": 130,
+                "neighbors": [
+                    "Quebec",
+                    "Greenland",
+                    "NorthwestTerritory",
+                    "Alberta",
+                    "WesternUS",
+                    "EasternUS"
+                ]
+            },
+            {
+                "name": "NorthwestTerritory",
+                "x": 180,
+                "y": 80,
+                "neighbors": [
+                    "Greenland",
+                    "Alaska",
+                    "Alberta",
+                    "Ontario"
+                ]
+            },
+            {
+                "name": "Alberta",
+                "x": 160,
+                "y": 130,
+                "neighbors": [
+                    "Alaska",
+                    "NorthwestTerritory",
+                    "Ontario",
+                    "WesternUS"
+                ]
+            },
+            {
+                "name": "Alaska",
+                "x": 120,
+                "y": 100,
+                "neighbors": [
+                    "NorthwestTerritory",
+                    "Alberta",
+                    "Kamchatka"
+                ]
+            },
+            {
+                "name": "WesternUS",
+                "x": 160,
+                "y": 180,
+                "neighbors": [
+                    "Alberta",
+                    "Ontario",
+                    "EasternUS",
+                    "CentralAmerica"
+                ]
+            },
+            {
+                "name": "EasternUS",
+                "x": 220,
+                "y": 190,
+                "neighbors": [
+                    "WesternUS",
+                    "Ontario",
+                    "Quebec",
+                    "CentralAmerica"
+                ]
+            },
+            {
+                "name": "CentralAmerica",
+                "x": 180,
+                "y": 230,
+                "neighbors": [
+                    "WesternUS",
+                    "EasternUS",
+                    "Venezuela"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "SouthAmerica",
+        "bonus": 2,
+        "color": [60, 179, 113, 255],
+        "territories": [
+            {
+                "name": "Venezuela",
+                "x": 220,
+                "y": 280,
+                "neighbors": [
+                    "CentralAmerica",
+                    "Brazil",
+                    "Peru"
+                ]
+            },
+            {
+                "name": "Peru",
+                "x": 200,
+                "y": 330,
+                "neighbors": [
+                    "Venezuela",
+                    "Brazil",
+                    "Argentina"
+                ]
+            },
+            {
+                "name": "Argentina",
+                "x": 230,
+                "y": 390,
+                "neighbors": [
+                    "Peru",
+                    "Brazil"
+                ]
+            },
+            {
+                "name": "Brazil",
+                "x": 260,
+                "y": 320,
+                "neighbors": [
+                    "Venezuela",
+                    "Peru",
+                    "Argentina",
+                    "NorthAfrica"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Africa",
+        "bonus": 3,
+        "color": [244, 164, 96, 255],
+        "territories": [
+            {
+                "name": "NorthAfrica",
+                "x": 310,
+                "y": 300,
+                "neighbors": [
+                    "Brazil",
+                    "WesternEurope",
+                    "SouthernEurope",
+                    "EastAfrica",
+                    "Egypt",
+                    "Congo"
+                ]
+            },
+            {
+                "name": "Egypt",
+                "x": 380,
+                "y": 290,
+                "neighbors": [
+                    "NorthAfrica",
+                    "SouthernEurope",
+                    "EastAfrica",
+                    "MiddleEast"
+                ]
+            },
+            {
+                "name": "EastAfrica",
+                "x": 390,
+                "y": 350,
+                "neighbors": [
+                    "Egypt",
+                    "NorthAfrica",
+                    "Congo",
+                    "SouthAfrica",
+                    "Madagascar"
+                ]
+            },
+            {
+                "name": "Congo",
+                "x": 340,
+                "y": 360,
+                "neighbors": [
+                    "NorthAfrica",
+                    "EastAfrica",
+                    "SouthAfrica"
+                ]
+            },
+            {
+                "name": "SouthAfrica",
+                "x": 370,
+                "y": 430,
+                "neighbors": [
+                    "Congo",
+                    "EastAfrica",
+                    "Madagascar"
+                ]
+            },
+            {
+                "name": "Madagascar",
+                "x": 410,
+                "y": 400,
+                "neighbors": [
+                    "SouthAfrica",
+                    "EastAfrica"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Asia",
+        "bonus": 7, 
+        "color": [238, 130, 238, 255],
+        "territories": [
+            {
+                "name": "MiddleEast",
+                "x": 420,
+                "y": 270,
+                "neighbors": [
+                    "SouthernEurope",
+                    "Ukraine",
+                    "Egypt",
+                    "India",
+                    "Afghanistan"
+                ]
+            },
+            {
+                "name": "Afghanistan",
+                "x": 460,
+                "y": 210,
+                "neighbors": [
+                    "MiddleEast",
+                    "Ukraine",
+                    "Ural",
+                    "China",
+                    "India"
+                ]
+            },
+            {
+                "name": "Ural",
+                "x": 490,
+                "y": 160,
+                "neighbors": [
+                    "Ukraine",
+                    "Afghanistan",
+                    "Siberia",
+                    "China"
+                ]
+            },
+            {
+                "name": "Siberia",
+                "x": 530,
+                "y": 120,
+                "neighbors": [
+                    "Ural",
+                    "Yakutsk",
+                    "Irkutsk",
+                    "Mongolia",
+                    "China"
+                ]
+            },
+            {
+                "name": "Yakutsk",
+                "x": 570,
+                "y": 100,
+                "neighbors": [
+                    "Siberia",
+                    "Kamchatka",
+                    "Irkutsk"
+                ]
+            },
+            {
+                "name": "Irkutsk",
+                "x": 570,
+                "y": 160,
+                "neighbors": [
+                    "Siberia",
+                    "Yakutsk",
+                    "Kamchatka",
+                    "Mongolia"
+                ]
+            },
+            {
+                "name": "Kamchatka",
+                "x": 620,
+                "y": 110,
+                "neighbors": [
+                    "Yakutsk",
+                    "Irkutsk",
+                    "Mongolia",
+                    "Japan",
+                    "Alaska"
+                ]
+            },
+            {
+                "name": "Mongolia",
+                "x": 580,
+                "y": 210,
+                "neighbors": [
+                    "Irkutsk",
+                    "Siberia",
+                    "Kamchatka",
+                    "Japan",
+                    "China"
+                ]
+            },
+            {
+                "name": "Japan",
+                "x": 640,
+                "y": 200,
+                "neighbors": [
+                    "Mongolia",
+                    "Kamchatka"
+                ]
+            },
+            {
+                "name": "China",
+                "x": 560,
+                "y": 260,
+                "neighbors": [
+                    "Afghanistan",
+                    "Ural",
+                    "Siberia",
+                    "Mongolia",
+                    "India",
+                    "Siam"
+                ]
+            },
+            {
+                "name": "India",
+                "x": 500,
+                "y": 260,
+                "neighbors": [
+                    "MiddleEast",
+                    "Afghanistan",
+                    "China",
+                    "Siam"
+                ]
+            },
+            {
+                "name": "Siam",
+                "x": 570,
+                "y": 310,
+                "neighbors": [
+                    "India",
+                    "China",
+                    "Indonesia"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Australia",
+        "bonus": 2,
+        "color": [255, 215, 0, 255],
+        "territories": [
+            {
+                "name": "Indonesia",
+                "x": 570,
+                "y": 360,
+                "neighbors": [
+                    "Siam",
+                    "NewGuinea",
+                    "WesternAustralia"
+                ]
+            },
+            {
+                "name": "NewGuinea",
+                "x": 610,
+                "y": 340,
+                "neighbors": [
+                    "Indonesia",
+                    "WesternAustralia",
+                    "EasternAustralia"
+                ]
+            },
+            {
+                "name": "WesternAustralia",
+                "x": 560,
+                "y": 420,
+                "neighbors": [
+                    "Indonesia",
+                    "NewGuinea",
+                    "EasternAustralia"
+                ]
+            },
+            {
+                "name": "EasternAustralia",
+                "x": 620,
+                "y": 400,
+                "neighbors": [
+                    "WesternAustralia",
+                    "NewGuinea"
+                ]
+            }
+        ]
+    }
+]
