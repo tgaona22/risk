@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "territory.h"
+#include "i_agent.h"
 #include <vector>
 #include <queue>
 #include <map>
@@ -11,33 +12,39 @@
 // Forward declare Territory.
 class Territory;
 
-class Map : public sf::Drawable {
+class Map : public sf::Drawable
+{
 private:
-  //std::vector<Territory*> territories;
-  std::map<std::string, Territory*> territories; // This maps territory names to pointers to Territory objects.
-  
+  // std::vector<Territory*> territories;
+  std::map<std::string, Territory *> named_territories; // This maps territory names to pointers to Territory objects.
+  std::vector<Territory *> territories;
+  std::map<std::string, std::vector<Territory *>> continents;
+  std::map<std::string, int> continents_bonus; // reinforcement bonus for controlling continent.
+
   // UI/Display related members.
-  sf::Vector2<int> position; // The upper left hand corner of the map.
-  sf::Vector2<int> size; // How long and wide the map is.
+  sf::Vector2<int> position;                // The upper left hand corner of the map.
+  sf::Vector2<int> size;                    // How long and wide the map is.
   std::vector<sf::Vertex> connecting_lines; // A vertex array of the lines between neighboring territories.
 public:
-  Map(const std::string& mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz);
+  Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz);
   ~Map();
 
-  Territory* getTerritory(const std::string& name);
-  const Territory* getTerritory(const std::string& name) const;
-  std::map<std::string, Territory*> getTerritories() const; // Note: this is copying the map...
+  const Territory *getTerritory(const std::string &name) const;
 
-  bool areConnected(const Territory*, const Territory*) const;
+  const std::map<std::string, Territory *> &getNamedTerritories() const;
+  const std::vector<Territory *> &getTerritories() const;
+  const std::vector<Territory *> getTerritories(int player_id) const;
+
+  std::map<std::string, int> continentOwners() const;
+  std::vector<std::string> getContinents(int player_id) const;
+  const std::map<std::string, int> &getContinentsBonus() const { return continents_bonus; }
+
+  bool areConnected(const Territory *, const Territory *) const;
 
   double getUnitAverage() const;
 
 private:
-  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-  // Functions related to map initialization.
-  void initTerritories(const std::string& mapfile);
-  void initNeighbors(const std::string& mapfile);
+  virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 
 #endif

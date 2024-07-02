@@ -1,4 +1,5 @@
 .vscode/
 build/
 data/
+include/
 SFML-2.6.1/

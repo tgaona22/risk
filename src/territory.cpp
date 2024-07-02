@@ -1,11 +1,16 @@
 #include "territory.h"
+// #include <nlohmann/json.hpp>
 
-Territory::Territory(const std::string &name, int pos_x, int pos_y) : name(name),
-                                                                      player_id(-1),
-                                                                      units(0),
-                                                                      radius(15),
-                                                                      position(pos_x, pos_y),
-                                                                      name_position(pos_x - radius, pos_y + radius)
+Territory::Territory(const std::string &name,
+                     const nlohmann::json &continent_json,
+                     int pos_x,
+                     int pos_y) : name(name),
+                                  continent(continent_json["name"].get<std::string>()),
+                                  player_id(-1),
+                                  units(0),
+                                  radius(15),
+                                  position(pos_x, pos_y),
+                                  name_position(pos_x - radius, pos_y + radius)
 {
   std::string root_dir = "C:\\Users\\TylerGaona\\Documents\\Projects\\tag2\\risk\\";
   font.loadFromFile(root_dir + "data/DroidSans.ttf");
@@ -13,12 +18,13 @@ Territory::Territory(const std::string &name, int pos_x, int pos_y) : name(name)
   name_text.setString(name);
   name_text.setCharacterSize(8);
   name_text.setPosition(name_position);
-  name_text.setColor(sf::Color::Red);
+  std::vector<int> name_color = continent_json["color"].get<std::vector<int>>();
+  name_text.setFillColor(sf::Color(name_color[0], name_color[1], name_color[2], name_color[3]));
   units_text.setFont(font);
   units_text.setString(std::to_string(units));
   units_text.setCharacterSize(8);
   units_text.setPosition(position.x - 2, position.y - 4);
-  units_text.setColor(sf::Color::Black);
+  units_text.setFillColor(sf::Color::Black);
   sprite.setPosition(position.x - radius, position.y - radius);
   sprite.setRadius(radius);
   sprite.setPointCount(80);
