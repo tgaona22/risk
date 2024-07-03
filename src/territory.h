@@ -17,7 +17,8 @@ private:
   // Game related data members.
   const std::string name;
   const std::string continent;
-  int player_id;                      // The id # of the player occupying the territory.
+  int player_id; // The id # of the player occupying the territory.
+  int id;
   int units;                          // The # of units in the territory.
   std::vector<Territory *> neighbors; // A list of all neighboring territories.
 
@@ -32,7 +33,7 @@ private:
 
 public:
   // Initialization related functions
-  Territory(const std::string &name, const nlohmann::json &continent_json, int pos_x, int pos_y);
+  Territory(int id, const std::string &name, const nlohmann::json &continent_json, int pos_x, int pos_y);
   void addNeighbor(Territory *territory);
 
   sf::Vector2f getPosition() const;
@@ -42,6 +43,7 @@ public:
   bool isOccupied() const;
   int getOccupierId() const;
   bool hasNeighbor(const Territory *territory) const;
+  int getId() const { return id; }
 
   void setOccupier(IAgent *occupier, int units);
   void reinforce(int reinforcements);

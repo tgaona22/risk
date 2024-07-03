@@ -1,12 +1,14 @@
 #include "territory.h"
 // #include <nlohmann/json.hpp>
 
-Territory::Territory(const std::string &name,
+Territory::Territory(int id,
+                     const std::string &name,
                      const nlohmann::json &continent_json,
                      int pos_x,
                      int pos_y) : name(name),
                                   continent(continent_json["name"].get<std::string>()),
                                   player_id(-1),
+                                  id(id),
                                   units(0),
                                   radius(15),
                                   position(pos_x, pos_y),
