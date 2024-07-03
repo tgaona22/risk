@@ -48,6 +48,8 @@ public:
   void setOccupier(IAgent *occupier, int units);
   void reinforce(int reinforcements);
 
+  sf::CircleShape &getSprite() { return sprite; }
+
 private:
   virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 

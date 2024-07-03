@@ -9,7 +9,9 @@ using json = nlohmann::json;
 
 Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) : position(pos),
                                                                                   size(sz),
-                                                                                  line_map_idx(-1)
+                                                                                  line_map_idx(-1),
+                                                                                  attacker(nullptr),
+                                                                                  defender(nullptr)
 {
   std::ifstream f(mapfile);
   json map_data = json::parse(f);
@@ -234,7 +236,7 @@ std::tuple<Territory *, Territory *> Map::pair(Territory *a, Territory *b) const
   return std::tie(first, second);
 }
 
-void Map::highlight_line(Territory *a, Territory *b)
+void Map::highlight_line(Territory *a, Territory *b, const sf::Color &color)
 {
   // unhighlight the previous line.
   if (line_map_idx != -1)
@@ -246,6 +248,27 @@ void Map::highlight_line(Territory *a, Territory *b)
     }
   }
 
+  if (attacker != nullptr)
+  {
+    sf::CircleShape &sprite = attacker->getSprite();
+    sprite.setOutlineColor(sf::Color::Transparent);
+    sprite.setOutlineThickness(0);
+  }
+  if (defender != nullptr)
+  {
+    sf::CircleShape &sprite = defender->getSprite();
+    sprite.setOutlineColor(sf::Color::Transparent);
+    sprite.setOutlineThickness(0);
+  }
+
+  attacker = b; // from
+  defender = a; // to
+  // highlight the territories themselves.
+  attacker->getSprite().setOutlineColor(sf::Color::White);
+  defender->getSprite().setOutlineColor(color);
+  attacker->getSprite().setOutlineThickness(2.5f);
+  defender->getSprite().setOutlineThickness(2.5f);
+
   Territory *first, *second;
   std::tie(first, second) = pair(a, b);
   line_map_idx = line_map.at(std::tie(first, second));
@@ -254,6 +277,6 @@ void Map::highlight_line(Territory *a, Territory *b)
   int lim = line_map_idx == alaska_idx ? 4 : 2;
   for (int j = 0; j < lim; ++j)
   {
-    connecting_lines.at(line_map_idx + j).color = sf::Color::Red;
+    connecting_lines.at(line_map_idx + j).color = color;
   }
 }

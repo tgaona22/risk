@@ -189,7 +189,7 @@ void Game::takeTurn(IAgent *player)
     std::tie(to, from, attacking_units) = askAgentToAttack(player);
     if (to != nullptr)
     {
-      map.highlight_line(to, from);
+      map.highlight_line(to, from, player->getColor());
 
       IAgent *defender = players.at(to->getOccupierId());
       int defending_units = askAgentToDefend(defender, to, from, attacking_units);

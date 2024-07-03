@@ -28,6 +28,7 @@ private:
   std::map<std::tuple<Territory *, Territory *>, int> line_map;
   int line_map_idx;
   int alaska_idx;
+  Territory *attacker, *defender;
 
 public:
   Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz);
@@ -48,7 +49,7 @@ public:
   double getUnitAverage() const;
 
   std::tuple<Territory *, Territory *> pair(Territory *a, Territory *b) const;
-  void highlight_line(Territory *a, Territory *b);
+  void highlight_line(Territory *a, Territory *b, const sf::Color &color);
 
 private:
   virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
