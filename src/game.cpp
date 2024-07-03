@@ -189,6 +189,8 @@ void Game::takeTurn(IAgent *player)
     std::tie(to, from, attacking_units) = askAgentToAttack(player);
     if (to != nullptr)
     {
+      map.highlight_line(to, from);
+
       IAgent *defender = players.at(to->getOccupierId());
       int defending_units = askAgentToDefend(defender, to, from, attacking_units);
       console.inform(player->getName() + " attacks " + to->getName() + " from " + from->getName() + " with " + std::to_string(attacking_units) + " units. " + defender->getName() + " defends with " + std::to_string(defending_units) + " units.");

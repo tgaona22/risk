@@ -8,7 +8,8 @@
 using json = nlohmann::json;
 
 Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) : position(pos),
-                                                                                  size(sz)
+                                                                                  size(sz),
+                                                                                  line_map_idx(-1)
 {
   std::ifstream f(mapfile);
   json map_data = json::parse(f);
@@ -23,9 +24,11 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
 
     std::vector<Territory *> c_ts;
 
+    int t_id = 0;
     for (auto &t : cont["territories"])
     {
-      Territory *territory = new Territory(t["name"], cont, t["x"], t["y"]);
+      Territory *territory = new Territory(t_id, t["name"], cont, t["x"], t["y"]);
+      ++t_id;
       named_territories.emplace(t["name"], territory);
       territories.push_back(territory);
       c_ts.push_back(territory);
@@ -33,7 +36,13 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
     continents[cont_name] = c_ts;
   }
 
+  // for purposes of higlighting, I need to keep a map from pairs of territories
+  // to vertices. (or maybe just territories -> vertices?)
+
+  // how about a function that takes two territories and returns the ordered pair.
+
   // Initialize each territory's list of neighbors.
+  int vertex_counter = 0;
   for (auto &cont : map_data)
   {
     for (auto &t_json : cont["territories"])
@@ -45,24 +54,32 @@ Map::Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz) 
         t->addNeighbor(n);
 
         // Draw the lines between territories. Alaska/Kamchatka is a special case.
-        if (t->getName().compare("Alaska") == 0 && n->getName().compare("Kamchatka") == 0)
+        Territory *first, *second;
+        std::tie(first, second) = pair(t, n);
+        // Note that id(Alaska) < id(Kamchatka).
+
+        if (line_map.find(std::tie(first, second)) == end(line_map))
         {
-          connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(105, 105, 105)));
-          connecting_lines.push_back(sf::Vertex(sf::Vector2f(0, 100), sf::Color(105, 105, 105)));
+          if (first->getName() == "Alaska" && second->getName() == "Kamchatka")
+          {
+            connecting_lines.push_back(sf::Vertex(first->getPosition(), sf::Color(105, 105, 105)));
+            connecting_lines.push_back(sf::Vertex(sf::Vector2f(0, 100), sf::Color(105, 105, 105)));
+            connecting_lines.push_back(sf::Vertex(second->getPosition(), sf::Color(105, 105, 105)));
+            connecting_lines.push_back(sf::Vertex(sf::Vector2f(size.x, 110), sf::Color(105, 105, 105)));
+
+            line_map[std::tie(first, second)] = vertex_counter;
+            alaska_idx = vertex_counter;
+            vertex_counter += 4;
+          }
+          else
+          {
+            connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(105, 105, 105)));
+            connecting_lines.push_back(sf::Vertex(n->getPosition(), sf::Color(105, 105, 105)));
+
+            line_map[std::tie(first, second)] = vertex_counter;
+            vertex_counter += 2;
+          }
         }
-        else if (t->getName().compare("Kamchatka") == 0 && n->getName().compare("Alaska") == 0)
-        {
-          connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(255, 0, 0)));
-          connecting_lines.push_back(sf::Vertex(sf::Vector2f(size.x, 110), sf::Color(255, 0, 0)));
-        }
-        else
-        {
-          // Add a line connecting the two territories.
-          connecting_lines.push_back(sf::Vertex(t->getPosition(), sf::Color(105, 105, 105)));
-          connecting_lines.push_back(sf::Vertex(n->getPosition(), sf::Color(105, 105, 105)));
-        }
-        // If I want to highlight actions between territories, I'll need a more intelligent
-        // way to store the lines.
       }
     }
   }
@@ -208,4 +225,35 @@ std::vector<std::string> Map::getContinents(int player_id) const
     }
   }
   return p_cs;
+}
+
+std::tuple<Territory *, Territory *> Map::pair(Territory *a, Territory *b) const
+{
+  Territory *first = (a->getId() < b->getId()) ? a : b;
+  Territory *second = (a->getId() < b->getId()) ? b : a;
+  return std::tie(first, second);
+}
+
+void Map::highlight_line(Territory *a, Territory *b)
+{
+  // unhighlight the previous line.
+  if (line_map_idx != -1)
+  {
+    int lim = line_map_idx == alaska_idx ? 4 : 2;
+    for (int j = 0; j < lim; ++j)
+    {
+      connecting_lines.at(line_map_idx + j).color = sf::Color(105, 105, 105);
+    }
+  }
+
+  Territory *first, *second;
+  std::tie(first, second) = pair(a, b);
+  line_map_idx = line_map.at(std::tie(first, second));
+
+  // Change the color of the appropriate lines if there is highlighting.
+  int lim = line_map_idx == alaska_idx ? 4 : 2;
+  for (int j = 0; j < lim; ++j)
+  {
+    connecting_lines.at(line_map_idx + j).color = sf::Color::Red;
+  }
 }

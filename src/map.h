@@ -25,6 +25,10 @@ private:
   sf::Vector2<int> position;                // The upper left hand corner of the map.
   sf::Vector2<int> size;                    // How long and wide the map is.
   std::vector<sf::Vertex> connecting_lines; // A vertex array of the lines between neighboring territories.
+  std::map<std::tuple<Territory *, Territory *>, int> line_map;
+  int line_map_idx;
+  int alaska_idx;
+
 public:
   Map(const std::string &mapfile, sf::Vector2<int> pos, sf::Vector2<int> sz);
   ~Map();
@@ -42,6 +46,9 @@ public:
   bool areConnected(const Territory *, const Territory *) const;
 
   double getUnitAverage() const;
+
+  std::tuple<Territory *, Territory *> pair(Territory *a, Territory *b) const;
+  void highlight_line(Territory *a, Territory *b);
 
 private:
   virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
