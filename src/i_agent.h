@@ -16,6 +16,7 @@ class IAgent
 protected:
   const Map &map;
   std::vector<const Territory *> territories;
+  std::vector<const IAgent *> opponents;
   int id;
   std::string name;
   sf::Color color;
@@ -48,6 +49,8 @@ public:
   virtual void informOfBattleOutcome(int attacker_id, int defender_id, int attacker_lost, int defender_lost, bool captured)
   {
   }
+
+  void setOpponents(const std::vector<IAgent *> &players);
 
 protected:
 };

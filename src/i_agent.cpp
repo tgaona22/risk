@@ -68,3 +68,14 @@ CardSet IAgent::turnInCards(const std::vector<std::tuple<int, int, int>> &card_s
   CardSet cards_turned_in = std::tie(cards.at(i), cards.at(j), cards.at(k));
   return cards_turned_in;
 }
+
+void IAgent::setOpponents(const std::vector<IAgent *> &players)
+{
+  for (const IAgent *player : players)
+  {
+    if (player->getId() != id)
+    {
+      opponents.push_back(player);
+    }
+  }
+}

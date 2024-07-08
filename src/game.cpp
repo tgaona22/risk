@@ -16,12 +16,16 @@ Game::Game(sf::Vector2<int> screen_size, const std::string &map_file) : console(
                                                                         cardset_counter(0),
                                                                         is_active(4, true)
 {
-  std::srand((unsigned)std::time(0));
+  // std::srand((unsigned)std::time(0));
   players.push_back(new PlanningAgent(map, 0, "Red", sf::Color::Red));
   // players.push_back(new HumanAgent(map, console, 1, sf::Color::Red));
   players.push_back(new RandomAgent(map, 1, "Purple", sf::Color::Magenta));
   players.push_back(new RandomAgent(map, 2, "Blue", sf::Color::Blue));
   players.push_back(new RandomAgent(map, 3, "Green", sf::Color::Green));
+  for (IAgent *p : players)
+  {
+    p->setOpponents(players);
+  }
 
   // create the deck of cards.
   std::vector<std::string> types = {"foot", "cavalry", "artillery"};
